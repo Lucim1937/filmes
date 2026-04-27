@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1920"/>
+<title>🎬 Bollywood PT – TV</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════
+   10-FOOT UI — TCL Google TV
+   Base: 1920×1080, viewed from ~3m
+═══════════════════════════════════════════ */
+:root{
+  --gold:#E8A234; --saffron:#FF6B2B; --deep-red:#8B1A1A; --maroon:#5C0A0A;
+  --cream:#FFF8EE; --dark:#120800; --dark2:#1E0C00; --dark3:#2A1200;
+  --muted:#C4956A; --border:rgba(232,162,52,.35);
+  --focus:#FFD700; --focus-glow:0 0 0 5px rgba(255,215,0,.55), 0 0 30px rgba(255,215,0,.3);
+  --sub-bg:rgba(0,0,0,.9);
+  --fs-xl:52px; --fs-lg:36px; --fs-md:28px; --fs-sm:22px; --fs-xs:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--dark)}
+body{font-family:'Crimson Pro',serif;color:var(--cream);cursor:none;user-select:none}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse at 15% 50%,rgba(139,26,26,.35) 0%,transparent 55%),
+             radial-gradient(ellipse at 85% 30%,rgba(232,162,52,.12) 0%,transparent 50%),
+             radial-gradient(ellipse at 50% 100%,rgba(255,107,43,.08) 0%,transparent 40%);
+  pointer-events:none;z-index:0}
+
+/* ── FOCUS SYSTEM ── */
+:focus{outline:none}
+.focusable:focus,
+.focusable.focused{
+  outline:5px solid var(--focus);
+  outline-offset:4px;
+  box-shadow:var(--focus-glow);
+}
+
+/* ════════════════════════
+   SCREEN MANAGER
+════════════════════════ */
+.screen{position:absolute;inset:0;z-index:1;display:none;flex-direction:column}
+.screen.active{display:flex}
+
+/* ════════════════════════
+   SCREEN: HOME
+════════════════════════ */
+#homeScreen{
+  background:transparent;
+  padding:0 100px;
+}
+
+/* Top bar */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:36px 0 28px;flex-shrink:0;
+}
+.logo{
+  font-family:'Playfair Display',serif;
+  font-size:var(--fs-xl);font-weight:900;line-height:1;
+  background:linear-gradient(135deg,var(--gold) 0%,var(--saffron) 50%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.logo-sub{font-size:var(--fs-xs);color:var(--muted);font-style:italic;margin-top:4px}
+.clock{font-size:var(--fs-sm);color:var(--muted);font-style:italic;text-align:right}
+
+/* Divider */
+.hdiv{height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--saffron),var(--gold),transparent);margin-bottom:32px;flex-shrink:0}
+
+/* Search row */
+.search-row{display:flex;gap:20px;margin-bottom:28px;flex-shrink:0}
+#searchBox{
+  flex:1;display:flex;align-items:center;
+  background:rgba(26,10,0,.85);
+  border:2px solid rgba(232,162,52,.4);
+  border-radius:8px;overflow:hidden;
+}
+#searchBox.focused{border-color:var(--focus);box-shadow:var(--focus-glow)}
+#searchInput{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--cream);font-family:'Crimson Pro',serif;
+  font-size:var(--fs-md);padding:20px 28px;caret-color:var(--gold);
+}
+#searchInput::placeholder{color:rgba(196,149,106,.45);font-style:italic}
+.search-icon{padding:0 28px;font-size:var(--fs-md);color:var(--gold);opacity:.7}
+
+#searchBtn{
+  background:linear-gradient(135deg,var(--deep-red),var(--maroon));
+  border:2px solid transparent;border-radius:8px;
+  color:var(--gold);font-family:'Playfair Display',serif;
+  font-size:var(--fs-sm);font-weight:700;letter-spacing:2px;
+  padding:20px 44px;cursor:pointer;text-transform:uppercase;
+  transition:all .2s;white-space:nowrap;
+}
+#searchBtn.focused{border-color:var(--focus);box-shadow:var(--focus-glow);background:linear-gradient(135deg,var(--saffron),var(--deep-red));color:var(--dark)}
+
+/* Category pills */
+.categories{display:flex;gap:14px;margin-bottom:30px;flex-shrink:0;flex-wrap:nowrap;overflow:hidden}
+.cat{
+  background:rgba(139,26,26,.25);border:2px solid rgba(232,162,52,.2);
+  border-radius:40px;padding:12px 26px;
+  font-size:var(--fs-xs);color:var(--muted);
+  cursor:pointer;transition:all .2s;white-space:nowrap;font-style:italic;
+}
+.cat.focused{border-color:var(--focus);color:var(--cream);background:rgba(232,162,52,.15);box-shadow:var(--focus-glow)}
+
+/* Status */
+#st{
+  font-size:var(--fs-xs);color:var(--muted);font-style:italic;
+  padding:0 0 16px;display:flex;align-items:center;gap:14px;flex-shrink:0;
+}
+.spin{width:22px;height:22px;border:3px solid rgba(232,162,52,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .75s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Movie grid */
+#gridWrap{flex:1;overflow:hidden;position:relative}
+#grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:24px;
+  padding:4px 4px 40px;
+  transition:transform .3s ease;
+}
+.card{
+  border-radius:10px;overflow:hidden;cursor:pointer;
+  background:rgba(26,10,0,.7);border:2px solid var(--border);
+  transition:all .25s;
+}
+.card.focused{
+  border-color:var(--focus);
+  transform:scale(1.06);
+  box-shadow:var(--focus-glow), 0 20px 50px rgba(0,0,0,.7);
+  z-index:10;position:relative;
+}
+.card-thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--dark2)}
+.card-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.card.focused .card-thumb img{transform:scale(1.08)}
+.card-play{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s}
+.card.focused .card-play{opacity:1}
+.play-icon{width:60px;height:60px;background:rgba(232,162,52,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(232,162,52,.6)}
+.play-icon::after{content:'';border:solid transparent;border-width:12px 0 12px 22px;border-left-color:var(--dark);margin-left:5px}
+.card-flag{position:absolute;top:8px;right:8px;background:rgba(139,26,26,.9);border:1px solid rgba(232,162,52,.4);border-radius:4px;padding:3px 8px;font-size:16px;color:var(--gold);letter-spacing:1px}
+.card-body{padding:14px 16px}
+.card-title{font-family:'Playfair Display',serif;font-size:var(--fs-xs);font-weight:700;color:var(--cream);line-height:1.3;margin-bottom:5px}
+.card-meta{font-size:16px;color:var(--muted);font-style:italic}
+
+/* ════════════════════════
+   SCREEN: PLAYER
+════════════════════════ */
+#playerScreen{background:#000;position:relative}
+
+/* Full-screen video */
+#ytDiv{position:absolute;inset:0;width:100%;height:100%}
+
+/* Subtitle overlay */
+#subOverlay{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:16px 120px 50px;text-align:center;
+  pointer-events:none;z-index:20;
+}
+#subText{
+  display:inline-block;
+  background:var(--sub-bg);color:#fff;
+  font-family:'Crimson Pro',serif;
+  font-size:48px;font-weight:400;line-height:1.4;
+  padding:10px 30px 12px;border-radius:8px;
+  max-width:80%;
+  text-shadow:0 2px 6px rgba(0,0,0,.95);
+}
+#subText:empty{display:none}
+
+/* Top HUD */
+#playerHud{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:30px 60px;z-index:20;
+  background:linear-gradient(to bottom,rgba(0,0,0,.75) 0%,transparent 100%);
+  transition:opacity .4s;
+}
+#playerHud.hidden{opacity:0;pointer-events:none}
+.hud-title{font-family:'Playfair Display',serif;font-size:var(--fs-lg);color:var(--gold);font-weight:700}
+.hud-back{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(139,26,26,.5);border:2px solid var(--border);border-radius:7px;
+  padding:12px 24px;color:var(--muted);font-size:var(--fs-xs);font-style:italic;
+  cursor:pointer;transition:all .2s;
+}
+.hud-back.focused{border-color:var(--focus);color:var(--cream);box-shadow:var(--focus-glow)}
+
+/* Subtitle status (bottom right) */
+#subStatus{
+  position:absolute;bottom:20px;right:40px;z-index:20;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(0,0,0,.6);border:1px solid var(--border);border-radius:6px;
+  padding:8px 16px;font-size:18px;color:var(--muted);font-style:italic;
+  transition:opacity .4s;
+}
+#subStatus.hidden{opacity:0}
+.sdot{width:8px;height:8px;border-radius:50%}
+.sdot.ok{background:var(--green,#2ecc71);box-shadow:0 0 6px var(--green,#2ecc71)}
+.sdot.warn{background:var(--gold);box-shadow:0 0 6px var(--gold)}
+.sdot.err{background:#e74c3c}
+.sdot.loading{background:var(--saffron);animation:blink .85s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* Embed error overlay */
+#embedErr{
+  display:none;position:absolute;inset:0;
+  background:rgba(18,8,0,.95);flex-direction:column;
+  align-items:center;justify-content:center;gap:24px;
+  text-align:center;padding:80px;z-index:30;
+}
+#embedErr.show{display:flex}
+#embedErr h2{font-family:'Playfair Display',serif;font-size:var(--fs-lg);color:var(--gold)}
+#embedErr p{font-size:var(--fs-xs);color:var(--muted);max-width:800px;line-height:1.7;font-style:italic}
+#embedErrBack{
+  background:var(--deep-red);border:2px solid var(--gold);border-radius:8px;
+  color:var(--gold);font-family:'Playfair Display',serif;font-size:var(--fs-sm);
+  font-weight:700;padding:18px 48px;cursor:pointer;letter-spacing:1px;
+  transition:all .2s;
+}
+#embedErrBack.focused{box-shadow:var(--focus-glow);background:var(--saffron);color:var(--dark)}
+
+/* ── LOADING SCREEN ── */
+#loadingScreen{
+  display:none;position:fixed;inset:0;
+  background:var(--dark);z-index:100;
+  flex-direction:column;align-items:center;justify-content:center;gap:20px;
+}
+#loadingScreen.active{display:flex}
+.loading-logo{font-family:'Playfair Display',serif;font-size:80px;font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--saffron),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.loading-bar-wrap{width:400px;height:4px;background:rgba(232,162,52,.15);border-radius:2px}
+.loading-bar{height:100%;background:linear-gradient(90deg,var(--deep-red),var(--saffron),var(--gold));border-radius:2px;animation:loadbar 1.6s ease infinite}
+@keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+.loading-msg{font-size:var(--fs-xs);color:var(--muted);font-style:italic}
+
+/* Scrollbar hide */
+*::-webkit-scrollbar{display:none}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loadingScreen" class="active">
+  <div class="loading-logo">Bollywood PT</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-msg">Carregando…</div>
+</div>
+
+<!-- ══════════════ HOME ══════════════ -->
+<div id="homeScreen" class="screen">
+  <div class="topbar">
+    <div>
+      <div class="logo">Bollywood PT</div>
+      <div class="logo-sub">✦ Cinema Indiano com Legendas em Português ✦</div>
+    </div>
+    <div class="clock" id="clock"></div>
+  </div>
+  <div class="hdiv"></div>
+
+  <!-- Search -->
+  <div class="search-row">
+    <div id="searchBox">
+      <span class="search-icon">🔍</span>
+      <input id="searchInput" type="text" placeholder="Buscar filme indiano… (Shah Rukh Khan, 3 Idiots, Baahubali)"
+             autocomplete="off" spellcheck="false"/>
+    </div>
+    <button id="searchBtn" class="focusable" tabindex="0">🎬 BUSCAR</button>
+  </div>
+
+  <!-- Categories -->
+  <div class="categories" id="catRow">
+    <div class="cat focusable" tabindex="0" data-q="filmes Bollywood completos gratuitos">Bollywood Grátis</div>
+    <div class="cat focusable" tabindex="0" data-q="Shah Rukh Khan filme completo">Shah Rukh Khan</div>
+    <div class="cat focusable" tabindex="0" data-q="RRR Baahubali ação indiana completo">Ação Épica</div>
+    <div class="cat focusable" tabindex="0" data-q="filme romântico hindi completo">Românticos</div>
+    <div class="cat focusable" tabindex="0" data-q="Amitabh Bachchan filmes clássicos">Clássicos</div>
+    <div class="cat focusable" tabindex="0" data-q="comédia indiana hindi completo">Comédias</div>
+    <div class="cat focusable" tabindex="0" data-q="Priyanka Chopra filmes completos">Priyanka Chopra</div>
+    <div class="cat focusable" tabindex="0" data-q="filme drama indiano completo">Drama</div>
+  </div>
+
+  <div id="st">Pressione 🔍 para buscar ou escolha uma categoria acima</div>
+
+  <!-- Grid -->
+  <div id="gridWrap">
+    <div id="grid"></div>
+  </div>
+</div>
+
+<!-- ══════════════ PLAYER ══════════════ -->
+<div id="playerScreen" class="screen">
+  <div id="ytDiv"></div>
+  <div id="subOverlay"><div id="subText"></div></div>
+
+  <div id="playerHud">
+    <div class="hud-back focusable" id="backBtn" tabindex="0">← VOLTAR</div>
+    <div class="hud-title" id="playerTitle"></div>
+  </div>
+
+  <div id="subStatus">
+    <div class="sdot loading" id="sdot"></div>
+    <span id="sl">Buscando legendas…</span>
+  </div>
+
+  <div id="embedErr">
+    <h2>🎬 Vídeo bloqueado para incorporação</h2>
+    <p>Este canal do YouTube não permite reprodução em apps externos. Abra o app YouTube na sua TV e pesquise o filme manualmente.</p>
+    <div id="embedErrBack" class="focusable" tabindex="0">← Voltar à busca</div>
+  </div>
+</div>
+
+<!-- YT SDK -->
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  document.getElementById('loadingScreen').classList.remove('active');
+  document.getElementById('homeScreen').classList.add('active');
+  focusEl(document.getElementById('searchBox'));
+  updateClock();
+  setInterval(updateClock, 1000);
+});
+
+function updateClock() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) + '\n' +
+    n.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});
+}
+
+// ══════════════════════════════════════════════════════
+//  FOCUS MANAGEMENT
+// ══════════════════════════════════════════════════════
+let focused = null;
+const FOCUS_CLASS = 'focused';
+
+function focusEl(el) {
+  if (!el) return;
+  if (focused) focused.classList.remove(FOCUS_CLASS);
+  focused = el;
+  el.classList.add(FOCUS_CLASS);
+  el.scrollIntoView({block:'nearest',inline:'nearest'});
+}
+
+// Navigation zones
+// home: searchBox → searchBtn → cats[0..n] → grid[0..n]
+// player: backBtn → embedErrBack
+
+// ══════════════════════════════════════════════════════
+//  D-PAD NAVIGATION
+// ══════════════════════════════════════════════════════
+const KEYS = {
+  UP: ['ArrowUp','Up'],
+  DOWN: ['ArrowDown','Down'],
+  LEFT: ['ArrowLeft','Left'],
+  RIGHT: ['ArrowRight','Right'],
+  ENTER: ['Enter',' '],
+  BACK: ['Backspace','Escape','GoBack'],
+};
+function isKey(e, group) { return KEYS[group].includes(e.key); }
+
+document.addEventListener('keydown', e => {
+  const screen = document.querySelector('.screen.active')?.id;
+  if (screen === 'homeScreen')   navHome(e);
+  if (screen === 'playerScreen') navPlayer(e);
+});
+
+/* ── HOME NAVIGATION ── */
+function navHome(e) {
+  const cats   = [...document.querySelectorAll('.cat')];
+  const cards  = [...document.querySelectorAll('.card')];
+  const search = document.getElementById('searchBox');
+  const btn    = document.getElementById('searchBtn');
+  const isSB   = focused === search;
+  const isBtn  = focused === btn;
+  const catIdx = cats.indexOf(focused);
+  const cardIdx= cards.indexOf(focused);
+
+  if (isKey(e,'ENTER')) {
+    if (isSB) { document.getElementById('searchInput').focus(); return; }
+    if (isBtn)  { doSearch(document.getElementById('searchInput').value.trim()); return; }
+    if (catIdx >= 0) { doSearch(focused.dataset.q); return; }
+    if (cardIdx >= 0) { focused.click(); return; }
+    e.preventDefault(); return;
+  }
+  if (isKey(e,'BACK')) {
+    document.getElementById('searchInput').blur();
+    focusEl(search); e.preventDefault(); return;
+  }
+
+  e.preventDefault();
+
+  if (isSB) {
+    if (isKey(e,'RIGHT')) { focusEl(btn); return; }
+    if (isKey(e,'DOWN'))  { cats.length ? focusEl(cats[0]) : (cards.length && focusEl(cards[0])); return; }
+    return;
+  }
+  if (isBtn) {
+    if (isKey(e,'LEFT'))  { focusEl(search); return; }
+    if (isKey(e,'DOWN'))  { cats.length ? focusEl(cats[0]) : (cards.length && focusEl(cards[0])); return; }
+    return;
+  }
+  if (catIdx >= 0) {
+    if (isKey(e,'LEFT'))  { catIdx > 0 ? focusEl(cats[catIdx-1]) : focusEl(search); return; }
+    if (isKey(e,'RIGHT')) { catIdx < cats.length-1 ? focusEl(cats[catIdx+1]) : focusEl(btn); return; }
+    if (isKey(e,'UP'))    { focusEl(search); return; }
+    if (isKey(e,'DOWN'))  { cards.length && focusEl(cards[0]); return; }
+    return;
+  }
+  if (cardIdx >= 0) {
+    const COLS = 5;
+    if (isKey(e,'RIGHT')) { cardIdx < cards.length-1 && focusEl(cards[cardIdx+1]); return; }
+    if (isKey(e,'LEFT'))  { cardIdx > 0 ? focusEl(cards[cardIdx-1]) : null; return; }
+    if (isKey(e,'DOWN'))  { cardIdx+COLS < cards.length && focusEl(cards[cardIdx+COLS]); return; }
+    if (isKey(e,'UP')) {
+      cardIdx >= COLS ? focusEl(cards[cardIdx-COLS]) : (cats.length ? focusEl(cats[0]) : focusEl(search));
+      return;
+    }
+    return;
+  }
+}
+
+/* ── PLAYER NAVIGATION ── */
+let hudTimer = null;
+function showHud() {
+  document.getElementById('playerHud').classList.remove('hidden');
+  document.getElementById('subStatus').classList.remove('hidden');
+  clearTimeout(hudTimer);
+  hudTimer = setTimeout(()=>{
+    document.getElementById('playerHud').classList.add('hidden');
+    document.getElementById('subStatus').classList.add('hidden');
+  }, 4000);
+}
+
+function navPlayer(e) {
+  showHud();
+  const back    = document.getElementById('backBtn');
+  const errBack = document.getElementById('embedErrBack');
+
+  if (isKey(e,'BACK') || isKey(e,'UP')) { closePlayer(); e.preventDefault(); return; }
+  if (isKey(e,'ENTER')) {
+    if (focused === back || focused === errBack) { closePlayer(); return; }
+  }
+  e.preventDefault();
+}
+
+// ══════════════════════════════════════════════════════
+//  YOUTUBE PLAYER
+// ══════════════════════════════════════════════════════
+let _ytRes;
+const ytReady = new Promise(r => { _ytRes = r; });
+window.onYouTubeIframeAPIReady = () => _ytRes();
+
+let player = null, subs = [], syncTimer = null, currentVideoId = '', embedBlocked = false;
+
+async function createPlayer(videoId) {
+  await ytReady;
+  embedBlocked = false;
+  document.getElementById('embedErr').classList.remove('show');
+  if (player) { try{player.destroy();}catch(e){} player = null; }
+  document.getElementById('ytDiv').innerHTML = '';
+
+  player = new YT.Player('ytDiv', {
+    videoId,
+    width:'1920', height:'1080',
+    playerVars:{ autoplay:1, cc_load_policy:1, cc_lang_pref:'pt-BR', hl:'pt-BR', rel:0, iv_load_policy:3, modestbranding:1 },
+    events:{
+      onReady: () => { startSync(); showHud(); },
+      onError: onYTError
+    }
+  });
+}
+
+function onYTError(e) {
+  if ([100,101,150,153].includes(e.data)) {
+    embedBlocked = true;
+    document.getElementById('embedErr').classList.add('show');
+    focusEl(document.getElementById('embedErrBack'));
+  }
+}
+
+function startSync() {
+  clearInterval(syncTimer);
+  syncTimer = setInterval(() => {
+    if (!player?.getCurrentTime) return;
+    const ms = player.getCurrentTime() * 1000;
+    const h = subs.find(s => ms >= s.s && ms < s.e);
+    document.getElementById('subText').textContent = h ? h.t : '';
+  }, 200);
+}
+
+// ══════════════════════════════════════════════════════
+//  SUBTITLE PIPELINE
+// ══════════════════════════════════════════════════════
+const PROXIES = [
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`
+];
+async function proxyFetch(url, ms=5000) {
+  for (const mk of PROXIES) {
+    try {
+      const ctrl=new AbortController(), t=setTimeout(()=>ctrl.abort(),ms);
+      const r=await fetch(mk(url),{signal:ctrl.signal});
+      clearTimeout(t); if(r.ok) return await r.text();
+    } catch {}
+  }
+  throw new Error('proxy failed');
+}
+
+function parseJSON3(raw) {
+  try {
+    const j=JSON.parse(raw);
+    return (j.events||[]).filter(e=>e.segs).map(e=>({
+      s:e.tStartMs, e:e.tStartMs+(e.dDurationMs||2800),
+      t:e.segs.map(x=>x.utf8||'').join('').replace(/\n/g,' ').trim()
+    })).filter(e=>e.t);
+  } catch { return []; }
+}
+
+async function tryLang(vid, lang, kind='') {
+  try {
+    const raw=await proxyFetch(`https://www.youtube.com/api/timedtext?v=${vid}&lang=${lang}&fmt=json3${kind?`&kind=${kind}`:''}`,4500);
+    return parseJSON3(raw);
+  } catch { return []; }
+}
+
+function setSS(text,mode='loading') {
+  document.getElementById('sdot').className='sdot '+mode;
+  document.getElementById('sl').textContent=text;
+}
+
+async function translateBatch(lines, lang) {
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:4096,
+      system:`Subtitle translator for Indian cinema. Translate from ${lang} to Brazilian Portuguese. Natural cinematic tone. Return ONLY JSON array of strings (same count). No markdown.`,
+      messages:[{role:'user',content:`Translate:\n${JSON.stringify(lines)}`}]
+    })
+  });
+  const d=await r.json();
+  const txt=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+  const m=txt.match(/\[[\s\S]*\]/); if(!m) throw new Error();
+  return JSON.parse(m[0]);
+}
+
+async function translateBackground(raw, lang) {
+  const BATCH=90, texts=raw.map(s=>s.t);
+  const total=Math.ceil(texts.length/BATCH);
+  for (let i=0;i<texts.length;i+=BATCH) {
+    setSS(`Traduzindo ${lang}→PT (${Math.floor(i/BATCH)+1}/${total})…`,'warn');
+    try {
+      const tr=await translateBatch(texts.slice(i,i+BATCH),lang);
+      tr.forEach((t,k)=>{const idx=i+k;if(idx<subs.length)subs[idx]={...raw[idx],t};});
+    } catch {}
+  }
+  setSS('Legendas em PT ✓','ok');
+}
+
+async function genAISubs(title, year) {
+  setSS('Gerando legendas com IA…','warn');
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:4000,
+      system:`Indian cinema expert. Generate ~100 Portuguese subtitles. Format: JSON array [{s:startMs,e:endMs,t:"text"}]. Include key dialogue, [♪ songs ♪]. Return ONLY valid JSON.`,
+      messages:[{role:'user',content:`Movie: "${title}"${year?` (${year})`:''}`}]
+    })
+  });
+  const d=await r.json();
+  const txt=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+  const m=txt.match(/\[[\s\S]*\]/); if(!m) return [];
+  return JSON.parse(m[0]);
+}
+
+async function loadSubs(videoId, title, year) {
+  subs=[]; setSS('Buscando legendas…','loading');
+
+  const [ptRes,enRes,hiRes,teRes] = await Promise.all([
+    tryLang(videoId,'pt-BR'), tryLang(videoId,'en'),
+    tryLang(videoId,'hi'),    tryLang(videoId,'te')
+  ]);
+
+  let chosen=null, lang='';
+  for (const [r,l] of [[ptRes,'pt'],[enRes,'en'],[hiRes,'hi'],[teRes,'te']]) {
+    if(r.length>5){chosen=r;lang=l;break;}
+  }
+  if (!chosen) {
+    setSS('Tentando ASR…');
+    const [ae,ah]=await Promise.all([tryLang(videoId,'en','asr'),tryLang(videoId,'hi','asr')]);
+    if(ae.length>5){chosen=ae;lang='en';}
+    else if(ah.length>5){chosen=ah;lang='hi';}
+  }
+
+  if (chosen) {
+    subs=chosen;
+    if(lang.startsWith('pt')){setSS('Legendas em PT ✓','ok');}
+    else translateBackground(chosen,lang.toUpperCase());
+  } else {
+    try {
+      const ai=await genAISubs(title,year);
+      if(ai.length){subs=ai;setSS('Legendas por IA ✓','warn');}
+      else setSS('Sem legendas','err');
+    } catch{setSS('Sem legendas','err');}
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  OPEN / CLOSE PLAYER
+// ══════════════════════════════════════════════════════
+function openPlayer(videoId, title, meta, year) {
+  clearInterval(syncTimer); subs=[]; embedBlocked=false;
+  currentVideoId=videoId;
+  document.getElementById('subText').textContent='';
+  document.getElementById('embedErr').classList.remove('show');
+  document.getElementById('playerTitle').textContent=title||'';
+  document.getElementById('homeScreen').classList.remove('active');
+  document.getElementById('playerScreen').classList.add('active');
+  focusEl(document.getElementById('backBtn'));
+  createPlayer(videoId);
+  loadSubs(videoId,title,year);
+}
+
+function closePlayer() {
+  clearInterval(syncTimer);
+  try{if(player)player.destroy();}catch(e){}
+  player=null; subs=[]; embedBlocked=false;
+  document.getElementById('subText').textContent='';
+  document.getElementById('playerScreen').classList.remove('active');
+  document.getElementById('homeScreen').classList.add('active');
+  // Refocus last focused card or search
+  const cards=[...document.querySelectorAll('.card')];
+  focusEl(cards.length ? cards[0] : document.getElementById('searchBox'));
+}
+
+document.getElementById('backBtn').addEventListener('click', closePlayer);
+document.getElementById('embedErrBack').addEventListener('click', closePlayer);
+
+// ══════════════════════════════════════════════════════
+//  MOVIE SEARCH
+// ══════════════════════════════════════════════════════
+function setSt(t,spin=false){
+  document.getElementById('st').innerHTML=spin?`<div class="spin"></div><span>${t}</span>`:`<span>${t}</span>`;
+}
+
+function renderCards(movies) {
+  const grid=document.getElementById('grid');
+  grid.innerHTML='';
+  if(!movies.length){setSt('Nenhum resultado. Tente outra busca.');return;}
+  movies.forEach((m,i)=>{
+    const c=document.createElement('div');
+    c.className='card focusable'; c.tabIndex=0;
+    c.style.animationDelay=`${i*.06}s`;
+    c.innerHTML=`<div class="card-thumb">
+      <img src="https://img.youtube.com/vi/${m.videoId}/hqdefault.jpg"
+           onerror="this.src='https://img.youtube.com/vi/${m.videoId}/default.jpg'" loading="lazy">
+      <div class="card-play"><div class="play-icon"></div></div>
+      <div class="card-flag">🇮🇳</div>
+    </div>
+    <div class="card-body">
+      <div class="card-title">${m.title}</div>
+      <div class="card-meta">${[m.year,m.genre,m.lang].filter(Boolean).join(' · ')}</div>
+    </div>`;
+    c.addEventListener('click',()=>openPlayer(m.videoId,m.title,[m.year,m.genre,m.lang].filter(Boolean).join(' · '),m.year));
+    grid.appendChild(c);
+  });
+  // Auto-focus first card
+  setTimeout(()=>focusEl(grid.querySelector('.card')),100);
+}
+
+async function doSearch(q) {
+  if(!q) return;
+  document.getElementById('searchInput').value=q;
+  document.getElementById('searchInput').blur();
+  focusEl(document.getElementById('searchBox'));
+  setSt(`Buscando "${q}"…`,true);
+  document.getElementById('grid').innerHTML='';
+
+  try {
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:1400,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:`Indian cinema expert. Find full movies on YouTube (T-Series, Rajshri, Shemaroo).\nQuery: "${q}"\nReturn JSON array 6-10 movies: [{videoId,title,year,genre,lang}]. Real 11-char YouTube IDs. Full movies only. ONLY valid JSON array, no markdown.`}]
+      })
+    });
+    const d=await r.json();
+    const txt=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const m=txt.match(/\[[\s\S]*?\]/); if(!m) throw new Error();
+    const movies=JSON.parse(m[0]).filter(m=>m.videoId&&/^[a-zA-Z0-9_-]{11}$/.test(m.videoId));
+    if(!movies.length) throw new Error();
+    setSt(`${movies.length} filmes encontrados — use ↑↓←→ para navegar, OK para assistir`);
+    renderCards(movies);
+  } catch {
+    setSt('Erro na busca. Verifique a conexão e tente novamente.');
+  }
+}
+
+window.doSearch=doSearch;
+
+// Category click
+document.querySelectorAll('.cat').forEach(c=>{
+  c.addEventListener('click',()=>doSearch(c.dataset.q));
+});
+
+// Search input — TV virtual keyboard will appear naturally
+document.getElementById('searchInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const q=document.getElementById('searchInput').value.trim();
+    if(q) doSearch(q);
+  }
+});
+
+// Keep searchBox focus class synced with input focus
+document.getElementById('searchInput').addEventListener('focus', ()=>{
+  document.getElementById('searchBox').classList.add('focused');
+  focused=document.getElementById('searchBox');
+});
+document.getElementById('searchInput').addEventListener('blur', ()=>{
+  document.getElementById('searchBox').classList.remove('focused');
+});
+</script>
+</body>
+</html>

@@ -6,726 +6,363 @@
 <title>🎬 Bollywood PT – TV</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
 <style>
-/* ═══════════════════════════════════════════
-   10-FOOT UI — TCL Google TV
-   Base: 1920×1080, viewed from ~3m
-═══════════════════════════════════════════ */
 :root{
-  --gold:#E8A234; --saffron:#FF6B2B; --deep-red:#8B1A1A; --maroon:#5C0A0A;
-  --cream:#FFF8EE; --dark:#120800; --dark2:#1E0C00; --dark3:#2A1200;
-  --muted:#C4956A; --border:rgba(232,162,52,.35);
-  --focus:#FFD700; --focus-glow:0 0 0 5px rgba(255,215,0,.55), 0 0 30px rgba(255,215,0,.3);
+  --gold:#E8A234;--saffron:#FF6B2B;--deep-red:#8B1A1A;--maroon:#5C0A0A;
+  --cream:#FFF8EE;--dark:#120800;--dark2:#1E0C00;
+  --muted:#C4956A;--border:rgba(232,162,52,.35);
+  --focus:#FFD700;--fg:0 0 0 5px rgba(255,215,0,.5),0 0 28px rgba(255,215,0,.28);
   --sub-bg:rgba(0,0,0,.9);
-  --fs-xl:52px; --fs-lg:36px; --fs-md:28px; --fs-sm:22px; --fs-xs:18px;
+  --fxl:52px;--flg:36px;--fmd:28px;--fsm:22px;--fxs:18px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:1920px;height:1080px;overflow:hidden;background:var(--dark)}
 body{font-family:'Crimson Pro',serif;color:var(--cream);cursor:none;user-select:none}
 body::before{content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse at 15% 50%,rgba(139,26,26,.35) 0%,transparent 55%),
-             radial-gradient(ellipse at 85% 30%,rgba(232,162,52,.12) 0%,transparent 50%),
-             radial-gradient(ellipse at 50% 100%,rgba(255,107,43,.08) 0%,transparent 40%);
+  background:radial-gradient(ellipse at 15% 50%,rgba(139,26,26,.32) 0%,transparent 55%),
+             radial-gradient(ellipse at 85% 30%,rgba(232,162,52,.1) 0%,transparent 50%);
   pointer-events:none;z-index:0}
-
-/* ── FOCUS SYSTEM ── */
 :focus{outline:none}
-.focusable:focus,
-.focusable.focused{
-  outline:5px solid var(--focus);
-  outline-offset:4px;
-  box-shadow:var(--focus-glow);
-}
-
-/* ════════════════════════
-   SCREEN MANAGER
-════════════════════════ */
+.focusable.focused{outline:5px solid var(--focus);outline-offset:3px;box-shadow:var(--fg)}
 .screen{position:absolute;inset:0;z-index:1;display:none;flex-direction:column}
 .screen.active{display:flex}
+*::-webkit-scrollbar{display:none}
 
-/* ════════════════════════
-   SCREEN: HOME
-════════════════════════ */
-#homeScreen{
-  background:transparent;
-  padding:0 100px;
-}
-
-/* Top bar */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:36px 0 28px;flex-shrink:0;
-}
-.logo{
-  font-family:'Playfair Display',serif;
-  font-size:var(--fs-xl);font-weight:900;line-height:1;
+#homeScreen{padding:0 90px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:32px 0 22px;flex-shrink:0}
+.logo{font-family:'Playfair Display',serif;font-size:var(--fxl);font-weight:900;
   background:linear-gradient(135deg,var(--gold) 0%,var(--saffron) 50%,var(--gold) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-.logo-sub{font-size:var(--fs-xs);color:var(--muted);font-style:italic;margin-top:4px}
-.clock{font-size:var(--fs-sm);color:var(--muted);font-style:italic;text-align:right}
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.logo-sub{font-size:var(--fxs);color:var(--muted);font-style:italic;margin-top:3px}
+.clock{font-size:var(--fsm);color:var(--muted);font-style:italic;text-align:right;white-space:pre-line}
+.hdiv{height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--saffron),var(--gold),transparent);margin-bottom:26px;flex-shrink:0}
 
-/* Divider */
-.hdiv{height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--saffron),var(--gold),transparent);margin-bottom:32px;flex-shrink:0}
+.search-row{display:flex;gap:18px;margin-bottom:22px;flex-shrink:0}
+#searchBox{flex:1;display:flex;align-items:center;background:rgba(26,10,0,.88);border:2px solid rgba(232,162,52,.38);border-radius:8px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+#searchBox.focused{border-color:var(--focus);box-shadow:var(--fg)}
+.sicon{padding:0 24px;font-size:var(--fmd);color:var(--gold);opacity:.7}
+#searchInput{flex:1;background:transparent;border:none;outline:none;color:var(--cream);font-family:'Crimson Pro',serif;font-size:var(--fmd);padding:18px 0;caret-color:var(--gold)}
+#searchInput::placeholder{color:rgba(196,149,106,.4);font-style:italic}
+#urlBtn{background:linear-gradient(135deg,var(--deep-red),var(--maroon));border:2px solid transparent;border-radius:8px;color:var(--gold);font-family:'Playfair Display',serif;font-size:var(--fsm);font-weight:700;letter-spacing:2px;padding:18px 40px;cursor:pointer;text-transform:uppercase;transition:all .2s;white-space:nowrap}
+#urlBtn.focused{border-color:var(--focus);box-shadow:var(--fg);background:linear-gradient(135deg,var(--saffron),var(--deep-red));color:var(--dark)}
 
-/* Search row */
-.search-row{display:flex;gap:20px;margin-bottom:28px;flex-shrink:0}
-#searchBox{
-  flex:1;display:flex;align-items:center;
-  background:rgba(26,10,0,.85);
-  border:2px solid rgba(232,162,52,.4);
-  border-radius:8px;overflow:hidden;
-}
-#searchBox.focused{border-color:var(--focus);box-shadow:var(--focus-glow)}
-#searchInput{
-  flex:1;background:transparent;border:none;outline:none;
-  color:var(--cream);font-family:'Crimson Pro',serif;
-  font-size:var(--fs-md);padding:20px 28px;caret-color:var(--gold);
-}
-#searchInput::placeholder{color:rgba(196,149,106,.45);font-style:italic}
-.search-icon{padding:0 28px;font-size:var(--fs-md);color:var(--gold);opacity:.7}
+.cats{display:flex;gap:12px;margin-bottom:24px;flex-shrink:0}
+.cat{background:rgba(139,26,26,.22);border:2px solid rgba(232,162,52,.18);border-radius:40px;padding:10px 24px;font-size:var(--fxs);color:var(--muted);cursor:pointer;white-space:nowrap;font-style:italic;transition:all .2s}
+.cat.focused{border-color:var(--focus);color:var(--cream);background:rgba(232,162,52,.13);box-shadow:var(--fg)}
+.cat.on{border-color:var(--gold);color:var(--gold);background:rgba(232,162,52,.1)}
 
-#searchBtn{
-  background:linear-gradient(135deg,var(--deep-red),var(--maroon));
-  border:2px solid transparent;border-radius:8px;
-  color:var(--gold);font-family:'Playfair Display',serif;
-  font-size:var(--fs-sm);font-weight:700;letter-spacing:2px;
-  padding:20px 44px;cursor:pointer;text-transform:uppercase;
-  transition:all .2s;white-space:nowrap;
-}
-#searchBtn.focused{border-color:var(--focus);box-shadow:var(--focus-glow);background:linear-gradient(135deg,var(--saffron),var(--deep-red));color:var(--dark)}
-
-/* Category pills */
-.categories{display:flex;gap:14px;margin-bottom:30px;flex-shrink:0;flex-wrap:nowrap;overflow:hidden}
-.cat{
-  background:rgba(139,26,26,.25);border:2px solid rgba(232,162,52,.2);
-  border-radius:40px;padding:12px 26px;
-  font-size:var(--fs-xs);color:var(--muted);
-  cursor:pointer;transition:all .2s;white-space:nowrap;font-style:italic;
-}
-.cat.focused{border-color:var(--focus);color:var(--cream);background:rgba(232,162,52,.15);box-shadow:var(--focus-glow)}
-
-/* Status */
-#st{
-  font-size:var(--fs-xs);color:var(--muted);font-style:italic;
-  padding:0 0 16px;display:flex;align-items:center;gap:14px;flex-shrink:0;
-}
-.spin{width:22px;height:22px;border:3px solid rgba(232,162,52,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .75s linear infinite;flex-shrink:0}
+#st{font-size:var(--fxs);color:var(--muted);font-style:italic;padding:0 0 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;min-height:44px}
+.spin{width:20px;height:20px;border:3px solid rgba(232,162,52,.18);border-top-color:var(--gold);border-radius:50%;animation:spin .75s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Movie grid */
-#gridWrap{flex:1;overflow:hidden;position:relative}
-#grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:24px;
-  padding:4px 4px 40px;
-  transition:transform .3s ease;
-}
-.card{
-  border-radius:10px;overflow:hidden;cursor:pointer;
-  background:rgba(26,10,0,.7);border:2px solid var(--border);
-  transition:all .25s;
-}
-.card.focused{
-  border-color:var(--focus);
-  transform:scale(1.06);
-  box-shadow:var(--focus-glow), 0 20px 50px rgba(0,0,0,.7);
-  z-index:10;position:relative;
-}
-.card-thumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--dark2)}
-.card-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
-.card.focused .card-thumb img{transform:scale(1.08)}
-.card-play{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s}
-.card.focused .card-play{opacity:1}
-.play-icon{width:60px;height:60px;background:rgba(232,162,52,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(232,162,52,.6)}
-.play-icon::after{content:'';border:solid transparent;border-width:12px 0 12px 22px;border-left-color:var(--dark);margin-left:5px}
-.card-flag{position:absolute;top:8px;right:8px;background:rgba(139,26,26,.9);border:1px solid rgba(232,162,52,.4);border-radius:4px;padding:3px 8px;font-size:16px;color:var(--gold);letter-spacing:1px}
-.card-body{padding:14px 16px}
-.card-title{font-family:'Playfair Display',serif;font-size:var(--fs-xs);font-weight:700;color:var(--cream);line-height:1.3;margin-bottom:5px}
-.card-meta{font-size:16px;color:var(--muted);font-style:italic}
+#gridWrap{flex:1;overflow:hidden}
+#grid{display:grid;grid-template-columns:repeat(5,1fr);gap:22px;padding:4px 4px 30px;transition:transform .28s ease}
+.card{border-radius:10px;overflow:hidden;cursor:pointer;background:rgba(26,10,0,.7);border:2px solid var(--border);transition:all .22s}
+.card.focused{border-color:var(--focus);transform:scale(1.07);box-shadow:var(--fg),0 18px 50px rgba(0,0,0,.7);z-index:10;position:relative}
+.cthumb{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--dark2)}
+.cthumb img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.card.focused .cthumb img{transform:scale(1.08)}
+.cpov{position:absolute;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .22s}
+.card.focused .cpov{opacity:1}
+.pbig{width:58px;height:58px;background:rgba(232,162,52,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 28px rgba(232,162,52,.6)}
+.pbig::after{content:'';border:solid transparent;border-width:11px 0 11px 20px;border-left-color:var(--dark);margin-left:5px}
+.cflag{position:absolute;top:8px;right:8px;background:rgba(139,26,26,.9);border:1px solid rgba(232,162,52,.35);border-radius:4px;padding:2px 8px;font-size:15px;color:var(--gold)}
+.cbody{padding:13px 15px}
+.ctitle{font-family:'Playfair Display',serif;font-size:var(--fxs);font-weight:700;color:var(--cream);line-height:1.3;margin-bottom:4px}
+.cmeta{font-size:15px;color:var(--muted);font-style:italic}
 
-/* ════════════════════════
-   SCREEN: PLAYER
-════════════════════════ */
+/* PLAYER */
 #playerScreen{background:#000;position:relative}
-
-/* Full-screen video */
 #ytDiv{position:absolute;inset:0;width:100%;height:100%}
-
-/* Subtitle overlay */
-#subOverlay{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:16px 120px 50px;text-align:center;
-  pointer-events:none;z-index:20;
-}
-#subText{
-  display:inline-block;
-  background:var(--sub-bg);color:#fff;
-  font-family:'Crimson Pro',serif;
-  font-size:48px;font-weight:400;line-height:1.4;
-  padding:10px 30px 12px;border-radius:8px;
-  max-width:80%;
-  text-shadow:0 2px 6px rgba(0,0,0,.95);
-}
+#subOverlay{position:absolute;bottom:0;left:0;right:0;padding:14px 100px 48px;text-align:center;pointer-events:none;z-index:20}
+#subText{display:inline-block;background:var(--sub-bg);color:#fff;font-family:'Crimson Pro',serif;font-size:46px;font-weight:400;line-height:1.4;padding:9px 28px 11px;border-radius:8px;max-width:82%;text-shadow:0 2px 6px rgba(0,0,0,.95)}
 #subText:empty{display:none}
-
-/* Top HUD */
-#playerHud{
-  position:absolute;top:0;left:0;right:0;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:30px 60px;z-index:20;
-  background:linear-gradient(to bottom,rgba(0,0,0,.75) 0%,transparent 100%);
-  transition:opacity .4s;
-}
+#playerHud{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:28px 56px;z-index:20;background:linear-gradient(to bottom,rgba(0,0,0,.72) 0%,transparent 100%);transition:opacity .35s}
 #playerHud.hidden{opacity:0;pointer-events:none}
-.hud-title{font-family:'Playfair Display',serif;font-size:var(--fs-lg);color:var(--gold);font-weight:700}
-.hud-back{
-  display:flex;align-items:center;gap:10px;
-  background:rgba(139,26,26,.5);border:2px solid var(--border);border-radius:7px;
-  padding:12px 24px;color:var(--muted);font-size:var(--fs-xs);font-style:italic;
-  cursor:pointer;transition:all .2s;
-}
-.hud-back.focused{border-color:var(--focus);color:var(--cream);box-shadow:var(--focus-glow)}
-
-/* Subtitle status (bottom right) */
-#subStatus{
-  position:absolute;bottom:20px;right:40px;z-index:20;
-  display:flex;align-items:center;gap:8px;
-  background:rgba(0,0,0,.6);border:1px solid var(--border);border-radius:6px;
-  padding:8px 16px;font-size:18px;color:var(--muted);font-style:italic;
-  transition:opacity .4s;
-}
-#subStatus.hidden{opacity:0}
+.hudBack{display:flex;align-items:center;gap:9px;background:rgba(139,26,26,.48);border:2px solid var(--border);border-radius:7px;padding:11px 22px;color:var(--muted);font-size:var(--fxs);font-style:italic;cursor:pointer;transition:all .2s}
+.hudBack.focused{border-color:var(--focus);color:var(--cream);box-shadow:var(--fg)}
+.hudTitle{font-family:'Playfair Display',serif;font-size:var(--flg);color:var(--gold);font-weight:700;max-width:1400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#subSt{position:absolute;bottom:18px;right:36px;z-index:20;display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.58);border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:17px;color:var(--muted);font-style:italic;transition:opacity .35s}
+#subSt.hidden{opacity:0}
 .sdot{width:8px;height:8px;border-radius:50%}
-.sdot.ok{background:var(--green,#2ecc71);box-shadow:0 0 6px var(--green,#2ecc71)}
+.sdot.ok{background:#2ecc71;box-shadow:0 0 6px #2ecc71}
 .sdot.warn{background:var(--gold);box-shadow:0 0 6px var(--gold)}
 .sdot.err{background:#e74c3c}
-.sdot.loading{background:var(--saffron);animation:blink .85s ease infinite}
+.sdot.ld{background:var(--saffron);animation:blink .85s ease infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-
-/* Embed error overlay */
-#embedErr{
-  display:none;position:absolute;inset:0;
-  background:rgba(18,8,0,.95);flex-direction:column;
-  align-items:center;justify-content:center;gap:24px;
-  text-align:center;padding:80px;z-index:30;
-}
+#embedErr{display:none;position:absolute;inset:0;background:rgba(18,8,0,.95);flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;padding:80px;z-index:30}
 #embedErr.show{display:flex}
-#embedErr h2{font-family:'Playfair Display',serif;font-size:var(--fs-lg);color:var(--gold)}
-#embedErr p{font-size:var(--fs-xs);color:var(--muted);max-width:800px;line-height:1.7;font-style:italic}
-#embedErrBack{
-  background:var(--deep-red);border:2px solid var(--gold);border-radius:8px;
-  color:var(--gold);font-family:'Playfair Display',serif;font-size:var(--fs-sm);
-  font-weight:700;padding:18px 48px;cursor:pointer;letter-spacing:1px;
-  transition:all .2s;
-}
-#embedErrBack.focused{box-shadow:var(--focus-glow);background:var(--saffron);color:var(--dark)}
+#embedErr h2{font-family:'Playfair Display',serif;font-size:var(--flg);color:var(--gold)}
+#embedErr p{font-size:var(--fxs);color:var(--muted);max-width:780px;line-height:1.7;font-style:italic}
+#errBack{background:var(--deep-red);border:2px solid var(--gold);border-radius:8px;color:var(--gold);font-family:'Playfair Display',serif;font-size:var(--fsm);font-weight:700;padding:16px 44px;cursor:pointer;letter-spacing:1px;transition:all .2s}
+#errBack.focused{box-shadow:var(--fg);background:var(--saffron);color:var(--dark)}
 
-/* ── LOADING SCREEN ── */
-#loadingScreen{
-  display:none;position:fixed;inset:0;
-  background:var(--dark);z-index:100;
-  flex-direction:column;align-items:center;justify-content:center;gap:20px;
-}
-#loadingScreen.active{display:flex}
-.loading-logo{font-family:'Playfair Display',serif;font-size:80px;font-weight:900;
-  background:linear-gradient(135deg,var(--gold),var(--saffron),var(--gold));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.loading-bar-wrap{width:400px;height:4px;background:rgba(232,162,52,.15);border-radius:2px}
-.loading-bar{height:100%;background:linear-gradient(90deg,var(--deep-red),var(--saffron),var(--gold));border-radius:2px;animation:loadbar 1.6s ease infinite}
-@keyframes loadbar{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
-.loading-msg{font-size:var(--fs-xs);color:var(--muted);font-style:italic}
-
-/* Scrollbar hide */
-*::-webkit-scrollbar{display:none}
+/* Modal */
+#manModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:50;align-items:center;justify-content:center}
+#manModal.show{display:flex}
+.manBox{background:var(--dark2);border:2px solid var(--gold);border-radius:14px;padding:50px 60px;width:1100px;text-align:center}
+.manBox h2{font-family:'Playfair Display',serif;font-size:var(--flg);color:var(--gold);margin-bottom:12px}
+.manBox p{font-size:var(--fxs);color:var(--muted);font-style:italic;margin-bottom:32px}
+#manInput{width:100%;background:rgba(26,10,0,.9);border:2px solid rgba(232,162,52,.4);border-radius:8px;color:var(--cream);font-family:'Crimson Pro',serif;font-size:var(--fmd);padding:18px 24px;outline:none;caret-color:var(--gold)}
+#manInput:focus{border-color:var(--focus)}
+.manBtns{display:flex;justify-content:center;gap:20px;margin-top:28px}
+.manBtn{background:linear-gradient(135deg,var(--deep-red),var(--maroon));border:2px solid transparent;border-radius:8px;color:var(--gold);font-family:'Playfair Display',serif;font-size:var(--fsm);font-weight:700;padding:16px 40px;cursor:pointer;letter-spacing:1px;transition:all .2s}
+.manBtn.focused,.manBtn:hover{border-color:var(--focus);box-shadow:var(--fg);background:linear-gradient(135deg,var(--saffron),var(--deep-red));color:var(--dark)}
+.manCancel{background:rgba(139,26,26,.3);border:2px solid var(--border)}
+.manCancel.focused,.manCancel:hover{border-color:var(--muted);background:rgba(139,26,26,.5);box-shadow:none;color:var(--cream)}
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
-<div id="loadingScreen" class="active">
-  <div class="loading-logo">Bollywood PT</div>
-  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
-  <div class="loading-msg">Carregando…</div>
-</div>
-
-<!-- ══════════════ HOME ══════════════ -->
 <div id="homeScreen" class="screen">
   <div class="topbar">
-    <div>
-      <div class="logo">Bollywood PT</div>
-      <div class="logo-sub">✦ Cinema Indiano com Legendas em Português ✦</div>
-    </div>
+    <div><div class="logo">Bollywood PT</div><div class="logo-sub">✦ Cinema Indiano com Legendas em Português ✦</div></div>
     <div class="clock" id="clock"></div>
   </div>
   <div class="hdiv"></div>
-
-  <!-- Search -->
   <div class="search-row">
-    <div id="searchBox">
-      <span class="search-icon">🔍</span>
-      <input id="searchInput" type="text" placeholder="Buscar filme indiano… (Shah Rukh Khan, 3 Idiots, Baahubali)"
-             autocomplete="off" spellcheck="false"/>
+    <div id="searchBox"><span class="sicon">🔍</span>
+      <input id="searchInput" type="text" placeholder="Filtrar filmes por nome, idioma ou gênero…" autocomplete="off" spellcheck="false"/>
     </div>
-    <button id="searchBtn" class="focusable" tabindex="0">🎬 BUSCAR</button>
+    <button id="urlBtn" class="focusable">🔗 COLAR URL</button>
   </div>
-
-  <!-- Categories -->
-  <div class="categories" id="catRow">
-    <div class="cat focusable" tabindex="0" data-q="filmes Bollywood completos gratuitos">Bollywood Grátis</div>
-    <div class="cat focusable" tabindex="0" data-q="Shah Rukh Khan filme completo">Shah Rukh Khan</div>
-    <div class="cat focusable" tabindex="0" data-q="RRR Baahubali ação indiana completo">Ação Épica</div>
-    <div class="cat focusable" tabindex="0" data-q="filme romântico hindi completo">Românticos</div>
-    <div class="cat focusable" tabindex="0" data-q="Amitabh Bachchan filmes clássicos">Clássicos</div>
-    <div class="cat focusable" tabindex="0" data-q="comédia indiana hindi completo">Comédias</div>
-    <div class="cat focusable" tabindex="0" data-q="Priyanka Chopra filmes completos">Priyanka Chopra</div>
-    <div class="cat focusable" tabindex="0" data-q="filme drama indiano completo">Drama</div>
+  <div class="cats" id="catRow">
+    <div class="cat focusable on" data-cat="todos">Todos</div>
+    <div class="cat focusable" data-cat="romance">Romance</div>
+    <div class="cat focusable" data-cat="ação">Ação</div>
+    <div class="cat focusable" data-cat="drama">Drama</div>
+    <div class="cat focusable" data-cat="comédia">Comédia</div>
+    <div class="cat focusable" data-cat="clássico">Clássicos</div>
+    <div class="cat focusable" data-cat="épico">Épicos</div>
+    <div class="cat focusable" data-cat="sul">Cinema Sul</div>
   </div>
-
-  <div id="st">Pressione 🔍 para buscar ou escolha uma categoria acima</div>
-
-  <!-- Grid -->
-  <div id="gridWrap">
-    <div id="grid"></div>
-  </div>
+  <div id="st">Use ↑↓←→ para navegar · OK para assistir</div>
+  <div id="gridWrap"><div id="grid"></div></div>
 </div>
 
-<!-- ══════════════ PLAYER ══════════════ -->
 <div id="playerScreen" class="screen">
   <div id="ytDiv"></div>
   <div id="subOverlay"><div id="subText"></div></div>
-
   <div id="playerHud">
-    <div class="hud-back focusable" id="backBtn" tabindex="0">← VOLTAR</div>
-    <div class="hud-title" id="playerTitle"></div>
+    <div class="hudBack focusable" id="backBtn">← VOLTAR</div>
+    <div class="hudTitle" id="playerTitle"></div>
   </div>
-
-  <div id="subStatus">
-    <div class="sdot loading" id="sdot"></div>
-    <span id="sl">Buscando legendas…</span>
-  </div>
-
+  <div id="subSt"><div class="sdot ld" id="sdot"></div><span id="sl">Buscando legendas…</span></div>
   <div id="embedErr">
-    <h2>🎬 Vídeo bloqueado para incorporação</h2>
-    <p>Este canal do YouTube não permite reprodução em apps externos. Abra o app YouTube na sua TV e pesquise o filme manualmente.</p>
-    <div id="embedErrBack" class="focusable" tabindex="0">← Voltar à busca</div>
+    <h2>🎬 Vídeo bloqueado</h2>
+    <p>Este canal não permite reprodução externa. Abra o app YouTube na TV e pesquise o filme.</p>
+    <div id="errBack" class="focusable">← Voltar</div>
   </div>
 </div>
 
-<!-- YT SDK -->
+<div id="manModal">
+  <div class="manBox">
+    <h2>🔗 Colar link do YouTube</h2>
+    <p>Cole o link de qualquer filme indiano do YouTube</p>
+    <input id="manInput" type="text" placeholder="https://youtube.com/watch?v=..."/>
+    <div class="manBtns">
+      <div class="manBtn focusable" id="manOk">▶ Abrir com Legenda</div>
+      <div class="manBtn manCancel focusable" id="manCancel">Cancelar</div>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-// ══════════════════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════════════════
-window.addEventListener('load', () => {
-  document.getElementById('loadingScreen').classList.remove('active');
-  document.getElementById('homeScreen').classList.add('active');
-  focusEl(document.getElementById('searchBox'));
-  updateClock();
-  setInterval(updateClock, 1000);
-});
-
-function updateClock() {
-  const n = new Date();
-  document.getElementById('clock').textContent =
-    n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) + '\n' +
-    n.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});
-}
-
-// ══════════════════════════════════════════════════════
-//  FOCUS MANAGEMENT
-// ══════════════════════════════════════════════════════
-let focused = null;
-const FOCUS_CLASS = 'focused';
-
-function focusEl(el) {
-  if (!el) return;
-  if (focused) focused.classList.remove(FOCUS_CLASS);
-  focused = el;
-  el.classList.add(FOCUS_CLASS);
-  el.scrollIntoView({block:'nearest',inline:'nearest'});
-}
-
-// Navigation zones
-// home: searchBox → searchBtn → cats[0..n] → grid[0..n]
-// player: backBtn → embedErrBack
-
-// ══════════════════════════════════════════════════════
-//  D-PAD NAVIGATION
-// ══════════════════════════════════════════════════════
-const KEYS = {
-  UP: ['ArrowUp','Up'],
-  DOWN: ['ArrowDown','Down'],
-  LEFT: ['ArrowLeft','Left'],
-  RIGHT: ['ArrowRight','Right'],
-  ENTER: ['Enter',' '],
-  BACK: ['Backspace','Escape','GoBack'],
-};
-function isKey(e, group) { return KEYS[group].includes(e.key); }
-
-document.addEventListener('keydown', e => {
-  const screen = document.querySelector('.screen.active')?.id;
-  if (screen === 'homeScreen')   navHome(e);
-  if (screen === 'playerScreen') navPlayer(e);
-});
-
-/* ── HOME NAVIGATION ── */
-function navHome(e) {
-  const cats   = [...document.querySelectorAll('.cat')];
-  const cards  = [...document.querySelectorAll('.card')];
-  const search = document.getElementById('searchBox');
-  const btn    = document.getElementById('searchBtn');
-  const isSB   = focused === search;
-  const isBtn  = focused === btn;
-  const catIdx = cats.indexOf(focused);
-  const cardIdx= cards.indexOf(focused);
-
-  if (isKey(e,'ENTER')) {
-    if (isSB) { document.getElementById('searchInput').focus(); return; }
-    if (isBtn)  { doSearch(document.getElementById('searchInput').value.trim()); return; }
-    if (catIdx >= 0) { doSearch(focused.dataset.q); return; }
-    if (cardIdx >= 0) { focused.click(); return; }
-    e.preventDefault(); return;
-  }
-  if (isKey(e,'BACK')) {
-    document.getElementById('searchInput').blur();
-    focusEl(search); e.preventDefault(); return;
-  }
-
-  e.preventDefault();
-
-  if (isSB) {
-    if (isKey(e,'RIGHT')) { focusEl(btn); return; }
-    if (isKey(e,'DOWN'))  { cats.length ? focusEl(cats[0]) : (cards.length && focusEl(cards[0])); return; }
-    return;
-  }
-  if (isBtn) {
-    if (isKey(e,'LEFT'))  { focusEl(search); return; }
-    if (isKey(e,'DOWN'))  { cats.length ? focusEl(cats[0]) : (cards.length && focusEl(cards[0])); return; }
-    return;
-  }
-  if (catIdx >= 0) {
-    if (isKey(e,'LEFT'))  { catIdx > 0 ? focusEl(cats[catIdx-1]) : focusEl(search); return; }
-    if (isKey(e,'RIGHT')) { catIdx < cats.length-1 ? focusEl(cats[catIdx+1]) : focusEl(btn); return; }
-    if (isKey(e,'UP'))    { focusEl(search); return; }
-    if (isKey(e,'DOWN'))  { cards.length && focusEl(cards[0]); return; }
-    return;
-  }
-  if (cardIdx >= 0) {
-    const COLS = 5;
-    if (isKey(e,'RIGHT')) { cardIdx < cards.length-1 && focusEl(cards[cardIdx+1]); return; }
-    if (isKey(e,'LEFT'))  { cardIdx > 0 ? focusEl(cards[cardIdx-1]) : null; return; }
-    if (isKey(e,'DOWN'))  { cardIdx+COLS < cards.length && focusEl(cards[cardIdx+COLS]); return; }
-    if (isKey(e,'UP')) {
-      cardIdx >= COLS ? focusEl(cards[cardIdx-COLS]) : (cats.length ? focusEl(cats[0]) : focusEl(search));
-      return;
-    }
-    return;
-  }
-}
-
-/* ── PLAYER NAVIGATION ── */
-let hudTimer = null;
-function showHud() {
-  document.getElementById('playerHud').classList.remove('hidden');
-  document.getElementById('subStatus').classList.remove('hidden');
-  clearTimeout(hudTimer);
-  hudTimer = setTimeout(()=>{
-    document.getElementById('playerHud').classList.add('hidden');
-    document.getElementById('subStatus').classList.add('hidden');
-  }, 4000);
-}
-
-function navPlayer(e) {
-  showHud();
-  const back    = document.getElementById('backBtn');
-  const errBack = document.getElementById('embedErrBack');
-
-  if (isKey(e,'BACK') || isKey(e,'UP')) { closePlayer(); e.preventDefault(); return; }
-  if (isKey(e,'ENTER')) {
-    if (focused === back || focused === errBack) { closePlayer(); return; }
-  }
-  e.preventDefault();
-}
-
-// ══════════════════════════════════════════════════════
-//  YOUTUBE PLAYER
-// ══════════════════════════════════════════════════════
-let _ytRes;
-const ytReady = new Promise(r => { _ytRes = r; });
-window.onYouTubeIframeAPIReady = () => _ytRes();
-
-let player = null, subs = [], syncTimer = null, currentVideoId = '', embedBlocked = false;
-
-async function createPlayer(videoId) {
-  await ytReady;
-  embedBlocked = false;
-  document.getElementById('embedErr').classList.remove('show');
-  if (player) { try{player.destroy();}catch(e){} player = null; }
-  document.getElementById('ytDiv').innerHTML = '';
-
-  player = new YT.Player('ytDiv', {
-    videoId,
-    width:'1920', height:'1080',
-    playerVars:{ autoplay:1, cc_load_policy:1, cc_lang_pref:'pt-BR', hl:'pt-BR', rel:0, iv_load_policy:3, modestbranding:1 },
-    events:{
-      onReady: () => { startSync(); showHud(); },
-      onError: onYTError
-    }
-  });
-}
-
-function onYTError(e) {
-  if ([100,101,150,153].includes(e.data)) {
-    embedBlocked = true;
-    document.getElementById('embedErr').classList.add('show');
-    focusEl(document.getElementById('embedErrBack'));
-  }
-}
-
-function startSync() {
-  clearInterval(syncTimer);
-  syncTimer = setInterval(() => {
-    if (!player?.getCurrentTime) return;
-    const ms = player.getCurrentTime() * 1000;
-    const h = subs.find(s => ms >= s.s && ms < s.e);
-    document.getElementById('subText').textContent = h ? h.t : '';
-  }, 200);
-}
-
-// ══════════════════════════════════════════════════════
-//  SUBTITLE PIPELINE
-// ══════════════════════════════════════════════════════
-const PROXIES = [
-  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-  u => `https://corsproxy.io/?${encodeURIComponent(u)}`
+const MOVIES=[
+  {id:"_7BYTNV29Oo",title:"Maine Pyar Kiya",year:"1989",genre:"romance",lang:"Hindi",cat:"romance"},
+  {id:"oLY48DNiPCs",title:"Hum Aapke Hain Koun",year:"1994",genre:"romance",lang:"Hindi",cat:"romance"},
+  {id:"xRqLFaOZ_gI",title:"Dilwale Dulhania Le Jayenge",year:"1995",genre:"romance",lang:"Hindi",cat:"romance"},
+  {id:"EAPH0k4VoYQ",title:"Kuch Kuch Hota Hai",year:"1998",genre:"romance",lang:"Hindi",cat:"romance"},
+  {id:"xfr64zoBTAQ",title:"Mohabbatein",year:"2000",genre:"romance",lang:"Hindi",cat:"romance"},
+  {id:"5IWCkF1n6p8",title:"Kabhi Khushi Kabhie Gham",year:"2001",genre:"romance",lang:"Hindi",cat:"romance"},
+  {id:"SZD6VCkBZpA",title:"Kal Ho Naa Ho",year:"2003",genre:"romance",lang:"Hindi",cat:"romance"},
+  {id:"nk6vdMXbRAY",title:"Veer-Zaara",year:"2004",genre:"romance",lang:"Hindi",cat:"romance"},
+  {id:"sZCyCPHqYlQ",title:"Jab We Met",year:"2007",genre:"romance",lang:"Hindi",cat:"romance"},
+  {id:"R2gb0T5Xekc",title:"Sholay",year:"1975",genre:"ação",lang:"Hindi",cat:"ação"},
+  {id:"kqr9JrCiLvI",title:"Don",year:"1978",genre:"ação",lang:"Hindi",cat:"ação"},
+  {id:"sxyjGPOoFaw",title:"Deewar",year:"1975",genre:"drama/ação",lang:"Hindi",cat:"ação"},
+  {id:"z8Sf-YQ6p3Q",title:"Dhoom",year:"2004",genre:"ação",lang:"Hindi",cat:"ação"},
+  {id:"K_LHQd4h2vQ",title:"Krrish",year:"2006",genre:"ação",lang:"Hindi",cat:"ação"},
+  {id:"UoqP29tGBXA",title:"Mother India",year:"1957",genre:"drama",lang:"Hindi",cat:"drama"},
+  {id:"jjPOQjVrGH4",title:"Anand",year:"1971",genre:"drama",lang:"Hindi",cat:"drama"},
+  {id:"e7TupfRLbsI",title:"Taare Zameen Par",year:"2007",genre:"drama",lang:"Hindi",cat:"drama"},
+  {id:"xRmw_97-V7k",title:"Udaan",year:"2010",genre:"drama",lang:"Hindi",cat:"drama"},
+  {id:"UjXpAzFyCvQ",title:"Andaz Apna Apna",year:"1994",genre:"comédia",lang:"Hindi",cat:"comédia"},
+  {id:"lxkh2e1BT3Q",title:"Hera Pheri",year:"2000",genre:"comédia",lang:"Hindi",cat:"comédia"},
+  {id:"vfAqVUAGBYY",title:"Munna Bhai M.B.B.S.",year:"2003",genre:"comédia/drama",lang:"Hindi",cat:"comédia"},
+  {id:"wqTnMGy_wqM",title:"Lage Raho Munna Bhai",year:"2006",genre:"comédia",lang:"Hindi",cat:"comédia"},
+  {id:"U-MlpHCQAls",title:"Welcome",year:"2007",genre:"comédia",lang:"Hindi",cat:"comédia"},
+  {id:"c_0dABPvBkQ",title:"3 Idiots",year:"2009",genre:"comédia/drama",lang:"Hindi",cat:"comédia"},
+  {id:"9QrO6RDMBZ0",title:"Mughal-E-Azam",year:"1960",genre:"drama histórico",lang:"Hindi",cat:"clássico"},
+  {id:"Bn0e9bMuJFs",title:"Awaara",year:"1951",genre:"drama clássico",lang:"Hindi",cat:"clássico"},
+  {id:"N3Vo0b3J_98",title:"Bobby",year:"1973",genre:"romance clássico",lang:"Hindi",cat:"clássico"},
+  {id:"VZ4JZ3lLqZA",title:"Aradhana",year:"1969",genre:"romance clássico",lang:"Hindi",cat:"clássico"},
+  {id:"sxXn3UEvZSI",title:"Lagaan",year:"2001",genre:"épico/esporte",lang:"Hindi",cat:"épico"},
+  {id:"Kzw3QHvkp_k",title:"Jodhaa Akbar",year:"2008",genre:"épico histórico",lang:"Hindi",cat:"épico"},
+  {id:"gSwpzIqHRY0",title:"Bajirao Mastani",year:"2015",genre:"épico histórico",lang:"Hindi",cat:"épico"},
+  {id:"TBqj6y6pSxs",title:"Baahubali: The Beginning",year:"2015",genre:"épico de ação",lang:"Telugu",cat:"sul"},
+  {id:"5gPxMEOSFiA",title:"Baahubali 2: The Conclusion",year:"2017",genre:"épico de ação",lang:"Telugu",cat:"sul"},
+  {id:"f_vbAtFSEc0",title:"RRR",year:"2022",genre:"ação épica",lang:"Telugu",cat:"sul"},
+  {id:"qXUl3VsbA6o",title:"Pushpa: The Rise",year:"2021",genre:"ação/thriller",lang:"Telugu",cat:"sul"},
+  {id:"i63SUC0NBDY",title:"KGF: Chapter 1",year:"2018",genre:"ação épica",lang:"Kannada",cat:"sul"},
+  {id:"A3smFR1CGHY",title:"Vikram",year:"2022",genre:"ação/thriller",lang:"Tamil",cat:"sul"},
 ];
-async function proxyFetch(url, ms=5000) {
-  for (const mk of PROXIES) {
-    try {
-      const ctrl=new AbortController(), t=setTimeout(()=>ctrl.abort(),ms);
-      const r=await fetch(mk(url),{signal:ctrl.signal});
-      clearTimeout(t); if(r.ok) return await r.text();
-    } catch {}
-  }
-  throw new Error('proxy failed');
-}
 
-function parseJSON3(raw) {
-  try {
-    const j=JSON.parse(raw);
-    return (j.events||[]).filter(e=>e.segs).map(e=>({
-      s:e.tStartMs, e:e.tStartMs+(e.dDurationMs||2800),
-      t:e.segs.map(x=>x.utf8||'').join('').replace(/\n/g,' ').trim()
-    })).filter(e=>e.t);
-  } catch { return []; }
-}
+let focused=null,activeCat='todos',searchQ='';
+let player=null,subs=[],syncTimer=null,embedBlocked=false;
+let _ytRes; const ytReady=new Promise(r=>{_ytRes=r;});
+window.onYouTubeIframeAPIReady=()=>_ytRes();
 
-async function tryLang(vid, lang, kind='') {
-  try {
-    const raw=await proxyFetch(`https://www.youtube.com/api/timedtext?v=${vid}&lang=${lang}&fmt=json3${kind?`&kind=${kind}`:''}`,4500);
-    return parseJSON3(raw);
-  } catch { return []; }
-}
+window.addEventListener('load',()=>{renderGrid();updateClock();setInterval(updateClock,1000);focusEl(document.getElementById('searchBox'));});
+function updateClock(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'\n'+n.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'});}
 
-function setSS(text,mode='loading') {
-  document.getElementById('sdot').className='sdot '+mode;
-  document.getElementById('sl').textContent=text;
-}
-
-async function translateBatch(lines, lang) {
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',max_tokens:4096,
-      system:`Subtitle translator for Indian cinema. Translate from ${lang} to Brazilian Portuguese. Natural cinematic tone. Return ONLY JSON array of strings (same count). No markdown.`,
-      messages:[{role:'user',content:`Translate:\n${JSON.stringify(lines)}`}]
-    })
+function filteredMovies(){
+  return MOVIES.filter(m=>{
+    const cOk=activeCat==='todos'||m.cat===activeCat;
+    const qOk=!searchQ||[m.title,m.lang,m.genre].join(' ').toLowerCase().includes(searchQ.toLowerCase());
+    return cOk&&qOk;
   });
-  const d=await r.json();
-  const txt=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-  const m=txt.match(/\[[\s\S]*\]/); if(!m) throw new Error();
-  return JSON.parse(m[0]);
 }
-
-async function translateBackground(raw, lang) {
-  const BATCH=90, texts=raw.map(s=>s.t);
-  const total=Math.ceil(texts.length/BATCH);
-  for (let i=0;i<texts.length;i+=BATCH) {
-    setSS(`Traduzindo ${lang}→PT (${Math.floor(i/BATCH)+1}/${total})…`,'warn');
-    try {
-      const tr=await translateBatch(texts.slice(i,i+BATCH),lang);
-      tr.forEach((t,k)=>{const idx=i+k;if(idx<subs.length)subs[idx]={...raw[idx],t};});
-    } catch {}
-  }
-  setSS('Legendas em PT ✓','ok');
-}
-
-async function genAISubs(title, year) {
-  setSS('Gerando legendas com IA…','warn');
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',max_tokens:4000,
-      system:`Indian cinema expert. Generate ~100 Portuguese subtitles. Format: JSON array [{s:startMs,e:endMs,t:"text"}]. Include key dialogue, [♪ songs ♪]. Return ONLY valid JSON.`,
-      messages:[{role:'user',content:`Movie: "${title}"${year?` (${year})`:''}`}]
-    })
+function renderGrid(kf=false){
+  const grid=document.getElementById('grid'),movies=filteredMovies();
+  grid.innerHTML='';
+  if(!movies.length){document.getElementById('st').textContent='Nenhum filme encontrado.';return;}
+  document.getElementById('st').textContent=`${movies.length} filmes disponíveis · ↑↓←→ para navegar · OK para assistir`;
+  movies.forEach((m,i)=>{
+    const c=document.createElement('div');c.className='card focusable';c.tabIndex=0;
+    c.innerHTML=`<div class="cthumb"><img src="https://img.youtube.com/vi/${m.id}/hqdefault.jpg" onerror="this.src='https://img.youtube.com/vi/${m.id}/mqdefault.jpg'" loading="lazy"><div class="cpov"><div class="pbig"></div></div><div class="cflag">🇮🇳 ${m.lang}</div></div><div class="cbody"><div class="ctitle">${m.title}</div><div class="cmeta">${m.year} · ${m.genre}</div></div>`;
+    c.addEventListener('click',()=>openPlayer(m));
+    grid.appendChild(c);
   });
-  const d=await r.json();
-  const txt=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-  const m=txt.match(/\[[\s\S]*\]/); if(!m) return [];
-  return JSON.parse(m[0]);
+  if(!kf) setTimeout(()=>focusEl(grid.querySelector('.card')),80);
 }
 
-async function loadSubs(videoId, title, year) {
-  subs=[]; setSS('Buscando legendas…','loading');
+function focusEl(el){if(!el)return;if(focused)focused.classList.remove('focused');focused=el;el.classList.add('focused');el.scrollIntoView({block:'nearest',inline:'nearest'});}
 
-  const [ptRes,enRes,hiRes,teRes] = await Promise.all([
-    tryLang(videoId,'pt-BR'), tryLang(videoId,'en'),
-    tryLang(videoId,'hi'),    tryLang(videoId,'te')
-  ]);
+const K={UP:['ArrowUp','Up'],DN:['ArrowDown','Down'],LT:['ArrowLeft','Left'],RT:['ArrowRight','Right'],OK:['Enter',' '],BK:['Backspace','Escape','GoBack']};
+function ik(e,g){return K[g].includes(e.key);}
 
-  let chosen=null, lang='';
-  for (const [r,l] of [[ptRes,'pt'],[enRes,'en'],[hiRes,'hi'],[teRes,'te']]) {
-    if(r.length>5){chosen=r;lang=l;break;}
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('manModal').classList.contains('show')){navModal(e);return;}
+  const scr=document.querySelector('.screen.active')?.id;
+  if(scr==='homeScreen')navHome(e);
+  if(scr==='playerScreen')navPlayer(e);
+});
+
+function navHome(e){
+  const cats=[...document.querySelectorAll('.cat')],cards=[...document.querySelectorAll('.card')];
+  const sb=document.getElementById('searchBox'),btn=document.getElementById('urlBtn');
+  const isSB=focused===sb,isBtn=focused===btn,ci=cats.indexOf(focused),ki=cards.indexOf(focused);
+  if(ik(e,'OK')){
+    if(isSB){document.getElementById('searchInput').focus();return;}
+    if(isBtn){openManModal();return;}
+    if(ci>=0){setCat(focused.dataset.cat);return;}
+    if(ki>=0){focused.click();return;}
+    e.preventDefault();return;
   }
-  if (!chosen) {
-    setSS('Tentando ASR…');
-    const [ae,ah]=await Promise.all([tryLang(videoId,'en','asr'),tryLang(videoId,'hi','asr')]);
-    if(ae.length>5){chosen=ae;lang='en';}
-    else if(ah.length>5){chosen=ah;lang='hi';}
+  if(ik(e,'BK')){document.getElementById('searchInput').blur();focusEl(sb);e.preventDefault();return;}
+  e.preventDefault();
+  if(isSB){if(ik(e,'RT'))focusEl(btn);if(ik(e,'DN'))cats.length?focusEl(cats[0]):cards.length&&focusEl(cards[0]);return;}
+  if(isBtn){if(ik(e,'LT'))focusEl(sb);if(ik(e,'DN'))cats.length?focusEl(cats[0]):cards.length&&focusEl(cards[0]);return;}
+  if(ci>=0){
+    if(ik(e,'LT'))ci>0?focusEl(cats[ci-1]):focusEl(sb);
+    if(ik(e,'RT'))ci<cats.length-1?focusEl(cats[ci+1]):focusEl(btn);
+    if(ik(e,'UP'))focusEl(sb);if(ik(e,'DN'))cards.length&&focusEl(cards[0]);return;
   }
-
-  if (chosen) {
-    subs=chosen;
-    if(lang.startsWith('pt')){setSS('Legendas em PT ✓','ok');}
-    else translateBackground(chosen,lang.toUpperCase());
-  } else {
-    try {
-      const ai=await genAISubs(title,year);
-      if(ai.length){subs=ai;setSS('Legendas por IA ✓','warn');}
-      else setSS('Sem legendas','err');
-    } catch{setSS('Sem legendas','err');}
+  if(ki>=0){
+    const C=5;
+    if(ik(e,'RT'))ki<cards.length-1&&focusEl(cards[ki+1]);
+    if(ik(e,'LT'))ki>0&&focusEl(cards[ki-1]);
+    if(ik(e,'DN'))ki+C<cards.length&&focusEl(cards[ki+C]);
+    if(ik(e,'UP'))ki>=C?focusEl(cards[ki-C]):cats.length?focusEl(cats[0]):focusEl(sb);
   }
 }
+let hudT=null;
+function showHud(){document.getElementById('playerHud').classList.remove('hidden');document.getElementById('subSt').classList.remove('hidden');clearTimeout(hudT);hudT=setTimeout(()=>{document.getElementById('playerHud').classList.add('hidden');document.getElementById('subSt').classList.add('hidden');},4000);}
+function navPlayer(e){showHud();if(ik(e,'BK')||ik(e,'UP')){closePlayer();e.preventDefault();return;}if(ik(e,'OK')&&(focused===document.getElementById('backBtn')||focused===document.getElementById('errBack'))){closePlayer();return;}e.preventDefault();}
+function navModal(e){if(ik(e,'BK')){closeManModal();e.preventDefault();}if(ik(e,'OK')){if(focused===document.getElementById('manOk'))doManOpen();if(focused===document.getElementById('manCancel'))closeManModal();}}
 
-// ══════════════════════════════════════════════════════
-//  OPEN / CLOSE PLAYER
-// ══════════════════════════════════════════════════════
-function openPlayer(videoId, title, meta, year) {
-  clearInterval(syncTimer); subs=[]; embedBlocked=false;
-  currentVideoId=videoId;
+function setCat(cat){activeCat=cat;document.querySelectorAll('.cat').forEach(c=>c.classList.toggle('on',c.dataset.cat===cat));renderGrid();setTimeout(()=>focusEl(document.querySelector('.card')||document.getElementById('searchBox')),80);}
+document.querySelectorAll('.cat').forEach(c=>c.addEventListener('click',()=>setCat(c.dataset.cat)));
+document.getElementById('searchInput').addEventListener('input',e=>{searchQ=e.target.value;renderGrid(true);});
+document.getElementById('searchInput').addEventListener('focus',()=>{document.getElementById('searchBox').classList.add('focused');focused=document.getElementById('searchBox');});
+document.getElementById('searchInput').addEventListener('blur',()=>{document.getElementById('searchBox').classList.remove('focused');});
+document.getElementById('urlBtn').addEventListener('click',openManModal);
+
+function openManModal(){document.getElementById('manInput').value='';document.getElementById('manModal').classList.add('show');setTimeout(()=>document.getElementById('manInput').focus(),100);}
+function closeManModal(){document.getElementById('manModal').classList.remove('show');focusEl(document.getElementById('searchBox'));}
+function extractId(s){const m=s.trim().match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);return m?m[1]:(/^[a-zA-Z0-9_-]{11}$/.test(s.trim())?s.trim():null);}
+function doManOpen(){const vid=extractId(document.getElementById('manInput').value);if(!vid){document.getElementById('manInput').style.borderColor='#e74c3c';setTimeout(()=>document.getElementById('manInput').style.borderColor='',1500);return;}closeManModal();openPlayer({id:vid,title:'Filme do YouTube',year:'',genre:'',lang:''});}
+document.getElementById('manOk').addEventListener('click',doManOpen);
+document.getElementById('manCancel').addEventListener('click',closeManModal);
+document.getElementById('manInput').addEventListener('keydown',e=>{if(e.key==='Enter')doManOpen();});
+
+async function createPlayer(videoId){
+  await ytReady;embedBlocked=false;
+  document.getElementById('embedErr').classList.remove('show');
+  if(player){try{player.destroy();}catch(e){}player=null;}
+  document.getElementById('ytDiv').innerHTML='';
+  player=new YT.Player('ytDiv',{videoId,width:'1920',height:'1080',
+    playerVars:{autoplay:1,cc_load_policy:1,cc_lang_pref:'pt-BR',hl:'pt-BR',rel:0,iv_load_policy:3,modestbranding:1},
+    events:{onReady:()=>{startSync();showHud();},onError:onYTErr}});
+}
+function onYTErr(e){if([100,101,150,153].includes(e.data)){embedBlocked=true;document.getElementById('embedErr').classList.add('show');focusEl(document.getElementById('errBack'));}}
+function startSync(){clearInterval(syncTimer);syncTimer=setInterval(()=>{if(!player?.getCurrentTime)return;const ms=player.getCurrentTime()*1000;const h=subs.find(s=>ms>=s.s&&ms<s.e);document.getElementById('subText').textContent=h?h.t:'';},200);}
+
+const PROXIES=[u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,u=>`https://corsproxy.io/?${encodeURIComponent(u)}`];
+async function pFetch(url,ms=5000){for(const mk of PROXIES){try{const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);const r=await fetch(mk(url),{signal:c.signal});clearTimeout(t);if(r.ok)return await r.text();}catch{}}throw new Error('fail');}
+function pJSON3(raw){try{const j=JSON.parse(raw);return(j.events||[]).filter(e=>e.segs).map(e=>({s:e.tStartMs,e:e.tStartMs+(e.dDurationMs||2800),t:e.segs.map(x=>x.utf8||'').join('').replace(/\n/g,' ').trim()})).filter(e=>e.t);}catch{return[];}}
+async function tryLang(vid,lang,kind=''){try{return pJSON3(await pFetch(`https://www.youtube.com/api/timedtext?v=${vid}&lang=${lang}&fmt=json3${kind?`&kind=${kind}`:''}`,4500));}catch{return[];}}
+function setSS(t,m='ld'){document.getElementById('sdot').className='sdot '+m;document.getElementById('sl').textContent=t;}
+
+// FREE translation — MyMemory API (no key needed)
+async function trLine(text,from){
+  if(!text.trim())return text;
+  try{const r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0,500))}&langpair=${from}|pt-BR`);const d=await r.json();return d?.responseData?.translatedText||text;}
+  catch{return text;}
+}
+async function trAll(raw,from){
+  setSS(`Traduzindo para PT…`,'warn');
+  const res=[...raw],CHK=8;
+  for(let i=0;i<raw.length;i+=CHK){
+    setSS(`Traduzindo ${from.toUpperCase()}→PT (${Math.round(i/raw.length*100)}%)…`,'warn');
+    const tr=await Promise.all(raw.slice(i,i+CHK).map(s=>trLine(s.t,from)));
+    tr.forEach((t,k)=>{res[i+k]={...raw[i+k],t};});
+    subs=res.slice(0,i+CHK);
+    await new Promise(r=>setTimeout(r,250));
+  }
+  subs=res;setSS('Legendas em PT ✓','ok');
+}
+
+async function loadSubs(videoId){
+  subs=[];setSS('Buscando legendas…','ld');
+  const[ptR,enR,hiR,teR]=await Promise.all([tryLang(videoId,'pt-BR'),tryLang(videoId,'en'),tryLang(videoId,'hi'),tryLang(videoId,'te')]);
+  let chosen=null,lang='';
+  for(const[r,l] of[[ptR,'pt'],[enR,'en'],[hiR,'hi'],[teR,'te']]){if(r.length>5){chosen=r;lang=l;break;}}
+  if(!chosen){setSS('Tentando ASR…','ld');const[ae,ah]=await Promise.all([tryLang(videoId,'en','asr'),tryLang(videoId,'hi','asr')]);if(ae.length>5){chosen=ae;lang='en';}else if(ah.length>5){chosen=ah;lang='hi';}}
+  if(chosen){subs=chosen;if(lang==='pt'||lang==='pt-BR'){setSS('Legendas em PT ✓','ok');}else trAll(chosen,lang);}
+  else setSS('Sem legenda neste vídeo','err');
+}
+
+function openPlayer(m){
+  clearInterval(syncTimer);subs=[];embedBlocked=false;
   document.getElementById('subText').textContent='';
   document.getElementById('embedErr').classList.remove('show');
-  document.getElementById('playerTitle').textContent=title||'';
+  document.getElementById('playerTitle').textContent=m.title+(m.year?` (${m.year})`:'');
   document.getElementById('homeScreen').classList.remove('active');
   document.getElementById('playerScreen').classList.add('active');
   focusEl(document.getElementById('backBtn'));
-  createPlayer(videoId);
-  loadSubs(videoId,title,year);
+  createPlayer(m.id);loadSubs(m.id);
 }
-
-function closePlayer() {
-  clearInterval(syncTimer);
-  try{if(player)player.destroy();}catch(e){}
-  player=null; subs=[]; embedBlocked=false;
+function closePlayer(){
+  clearInterval(syncTimer);try{if(player)player.destroy();}catch(e){}player=null;subs=[];
   document.getElementById('subText').textContent='';
   document.getElementById('playerScreen').classList.remove('active');
   document.getElementById('homeScreen').classList.add('active');
-  // Refocus last focused card or search
-  const cards=[...document.querySelectorAll('.card')];
-  focusEl(cards.length ? cards[0] : document.getElementById('searchBox'));
+  focusEl(document.querySelector('.card')||document.getElementById('searchBox'));
 }
-
-document.getElementById('backBtn').addEventListener('click', closePlayer);
-document.getElementById('embedErrBack').addEventListener('click', closePlayer);
-
-// ══════════════════════════════════════════════════════
-//  MOVIE SEARCH
-// ══════════════════════════════════════════════════════
-function setSt(t,spin=false){
-  document.getElementById('st').innerHTML=spin?`<div class="spin"></div><span>${t}</span>`:`<span>${t}</span>`;
-}
-
-function renderCards(movies) {
-  const grid=document.getElementById('grid');
-  grid.innerHTML='';
-  if(!movies.length){setSt('Nenhum resultado. Tente outra busca.');return;}
-  movies.forEach((m,i)=>{
-    const c=document.createElement('div');
-    c.className='card focusable'; c.tabIndex=0;
-    c.style.animationDelay=`${i*.06}s`;
-    c.innerHTML=`<div class="card-thumb">
-      <img src="https://img.youtube.com/vi/${m.videoId}/hqdefault.jpg"
-           onerror="this.src='https://img.youtube.com/vi/${m.videoId}/default.jpg'" loading="lazy">
-      <div class="card-play"><div class="play-icon"></div></div>
-      <div class="card-flag">🇮🇳</div>
-    </div>
-    <div class="card-body">
-      <div class="card-title">${m.title}</div>
-      <div class="card-meta">${[m.year,m.genre,m.lang].filter(Boolean).join(' · ')}</div>
-    </div>`;
-    c.addEventListener('click',()=>openPlayer(m.videoId,m.title,[m.year,m.genre,m.lang].filter(Boolean).join(' · '),m.year));
-    grid.appendChild(c);
-  });
-  // Auto-focus first card
-  setTimeout(()=>focusEl(grid.querySelector('.card')),100);
-}
-
-async function doSearch(q) {
-  if(!q) return;
-  document.getElementById('searchInput').value=q;
-  document.getElementById('searchInput').blur();
-  focusEl(document.getElementById('searchBox'));
-  setSt(`Buscando "${q}"…`,true);
-  document.getElementById('grid').innerHTML='';
-
-  try {
-    const r=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',max_tokens:1400,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:`Indian cinema expert. Find full movies on YouTube (T-Series, Rajshri, Shemaroo).\nQuery: "${q}"\nReturn JSON array 6-10 movies: [{videoId,title,year,genre,lang}]. Real 11-char YouTube IDs. Full movies only. ONLY valid JSON array, no markdown.`}]
-      })
-    });
-    const d=await r.json();
-    const txt=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-    const m=txt.match(/\[[\s\S]*?\]/); if(!m) throw new Error();
-    const movies=JSON.parse(m[0]).filter(m=>m.videoId&&/^[a-zA-Z0-9_-]{11}$/.test(m.videoId));
-    if(!movies.length) throw new Error();
-    setSt(`${movies.length} filmes encontrados — use ↑↓←→ para navegar, OK para assistir`);
-    renderCards(movies);
-  } catch {
-    setSt('Erro na busca. Verifique a conexão e tente novamente.');
-  }
-}
-
-window.doSearch=doSearch;
-
-// Category click
-document.querySelectorAll('.cat').forEach(c=>{
-  c.addEventListener('click',()=>doSearch(c.dataset.q));
-});
-
-// Search input — TV virtual keyboard will appear naturally
-document.getElementById('searchInput').addEventListener('keydown', e=>{
-  if(e.key==='Enter'){
-    e.preventDefault();
-    const q=document.getElementById('searchInput').value.trim();
-    if(q) doSearch(q);
-  }
-});
-
-// Keep searchBox focus class synced with input focus
-document.getElementById('searchInput').addEventListener('focus', ()=>{
-  document.getElementById('searchBox').classList.add('focused');
-  focused=document.getElementById('searchBox');
-});
-document.getElementById('searchInput').addEventListener('blur', ()=>{
-  document.getElementById('searchBox').classList.remove('focused');
-});
+document.getElementById('backBtn').addEventListener('click',closePlayer);
+document.getElementById('errBack').addEventListener('click',closePlayer);
 </script>
 </body>
 </html>

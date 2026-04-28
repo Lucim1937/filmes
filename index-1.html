@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Bollywood PT – TV</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & SCALE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: #120800;
+  overflow: hidden;
+  font-family: 'Crimson Pro', Georgia, serif;
+  color: #FFF8EE;
+}
+
+/* Scale 1920×1080 canvas to any screen */
+#app {
+  position: fixed;
+  width: 1920px; height: 1080px;
+  top: 0; left: 0;
+  transform-origin: top left;
+  background: #120800;
+}
+
+/* Ambient glow */
+#app::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 50%, rgba(139,26,26,.35) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 30%, rgba(232,162,52,.12) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── SCREENS ── */
+.screen {
+  position: absolute; inset: 0; z-index: 1;
+  display: none; flex-direction: column;
+}
+/* Home is visible by default — no JS needed */
+#home { display: flex; padding: 0 90px; }
+#player { background: #000; }
+
+/* ── HOME: TOP BAR ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 32px 0 18px; flex-shrink: 0;
+}
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 52px; font-weight: 900; line-height: 1;
+  background: linear-gradient(135deg, #E8A234, #FF6B2B, #E8A234);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.logo-sub { font-size: 18px; color: #C4956A; font-style: italic; margin-top: 4px; }
+#clock { font-size: 22px; color: #C4956A; font-style: italic; text-align: right; white-space: pre-line; }
+
+.divider {
+  height: 1px; flex-shrink: 0; margin-bottom: 20px;
+  background: linear-gradient(90deg, transparent, #E8A234, #FF6B2B, #E8A234, transparent);
+}
+
+/* ── SEARCH ROW ── */
+.srow { display: flex; gap: 16px; margin-bottom: 18px; flex-shrink: 0; }
+
+#searchWrap {
+  flex: 1; display: flex; align-items: center;
+  background: rgba(26,10,0,.9); border: 2px solid rgba(232,162,52,.4);
+  border-radius: 8px; overflow: hidden;
+}
+#searchWrap.focused { border-color: #FFD700; box-shadow: 0 0 0 4px rgba(255,215,0,.4), 0 0 24px rgba(255,215,0,.2); }
+
+.sico { padding: 0 20px; font-size: 28px; opacity: .7; }
+
+#searchInput {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: #FFF8EE; font-family: inherit; font-size: 26px;
+  padding: 16px 0; caret-color: #E8A234;
+}
+#searchInput::placeholder { color: rgba(196,149,106,.45); font-style: italic; }
+
+#urlBtn {
+  background: linear-gradient(135deg, #8B1A1A, #5C0A0A);
+  border: 2px solid transparent; border-radius: 8px;
+  color: #E8A234; font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700; letter-spacing: 2px;
+  padding: 16px 36px; cursor: pointer; text-transform: uppercase;
+  white-space: nowrap; transition: all .2s;
+}
+#urlBtn.focused {
+  border-color: #FFD700;
+  box-shadow: 0 0 0 4px rgba(255,215,0,.4);
+  background: linear-gradient(135deg, #FF6B2B, #8B1A1A);
+  color: #120800;
+}
+
+/* ── CATEGORIES ── */
+.cats { display: flex; gap: 12px; margin-bottom: 18px; flex-shrink: 0; }
+.cat {
+  background: rgba(139,26,26,.22); border: 2px solid rgba(232,162,52,.2);
+  border-radius: 40px; padding: 9px 22px;
+  font-size: 18px; color: #C4956A; cursor: pointer;
+  white-space: nowrap; font-style: italic; transition: all .2s;
+}
+.cat.focused { border-color: #FFD700; color: #FFF8EE; background: rgba(232,162,52,.12); box-shadow: 0 0 0 4px rgba(255,215,0,.35); }
+.cat.on { border-color: #E8A234; color: #E8A234; background: rgba(232,162,52,.1); }
+
+/* ── STATUS ── */
+#st {
+  font-size: 18px; color: #C4956A; font-style: italic;
+  padding: 0 0 12px; flex-shrink: 0; min-height: 38px;
+  display: flex; align-items: center; gap: 12px;
+}
+.spin {
+  width: 20px; height: 20px; flex-shrink: 0;
+  border: 3px solid rgba(232,162,52,.2); border-top-color: #E8A234;
+  border-radius: 50%; animation: spin .75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── GRID ── */
+#gridWrap { flex: 1; overflow: hidden; }
+#grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  padding: 4px 2px 20px;
+}
+
+.card {
+  border-radius: 10px; overflow: hidden; cursor: pointer;
+  background: rgba(26,10,0,.75); border: 2px solid rgba(232,162,52,.3);
+  transition: all .22s;
+}
+.card.focused {
+  border-color: #FFD700;
+  transform: scale(1.07);
+  box-shadow: 0 0 0 4px rgba(255,215,0,.4), 0 0 28px rgba(255,215,0,.25), 0 16px 44px rgba(0,0,0,.7);
+  z-index: 10; position: relative;
+}
+
+/* Poster */
+.poster {
+  width: 100%; aspect-ratio: 16/9;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+  position: relative; overflow: hidden;
+}
+.poster-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px; padding: 14px;
+}
+.poster-icon { font-size: 44px; }
+.poster-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; color: #E8A234;
+  text-align: center; line-height: 1.3;
+  text-shadow: 0 1px 4px rgba(0,0,0,.8);
+}
+.card.focused .poster-title { color: #FFD700; }
+.play-circle {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.4);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .22s;
+}
+.card.focused .play-circle { opacity: 1; }
+.play-icon {
+  width: 56px; height: 56px;
+  background: rgba(232,162,52,.92); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 26px rgba(232,162,52,.6);
+}
+.play-icon::after {
+  content: '';
+  border: solid transparent;
+  border-width: 11px 0 11px 20px;
+  border-left-color: #120800;
+  margin-left: 5px;
+}
+.lang-badge {
+  position: absolute; top: 7px; right: 7px;
+  background: rgba(139,26,26,.92); border: 1px solid rgba(232,162,52,.35);
+  border-radius: 4px; padding: 2px 8px;
+  font-size: 13px; color: #E8A234;
+}
+
+.card-body { padding: 12px 14px; }
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 700; color: #FFF8EE;
+  line-height: 1.3; margin-bottom: 3px;
+}
+.card-meta { font-size: 13px; color: #C4956A; font-style: italic; }
+
+/* ── PLAYER ── */
+#ytDiv { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+#subOverlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 12px 100px 46px; text-align: center;
+  pointer-events: none; z-index: 20;
+}
+#subText {
+  display: inline-block;
+  background: rgba(0,0,0,.9); color: #fff;
+  font-family: inherit; font-size: 44px; line-height: 1.4;
+  padding: 8px 26px 10px; border-radius: 8px;
+  max-width: 86%; text-shadow: 0 2px 6px rgba(0,0,0,.95);
+}
+#subText:empty { display: none; }
+
+#hud {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 26px 54px; z-index: 20;
+  background: linear-gradient(to bottom, rgba(0,0,0,.72), transparent);
+  transition: opacity .35s;
+}
+#hud.hidden { opacity: 0; pointer-events: none; }
+
+#backBtn {
+  display: flex; align-items: center; gap: 9px;
+  background: rgba(139,26,26,.5); border: 2px solid rgba(232,162,52,.35);
+  border-radius: 7px; padding: 10px 20px;
+  color: #C4956A; font-size: 18px; font-style: italic;
+  cursor: pointer; transition: all .2s;
+}
+#backBtn.focused { border-color: #FFD700; color: #FFF8EE; box-shadow: 0 0 0 4px rgba(255,215,0,.35); }
+#playerTitle { font-family: 'Playfair Display', serif; font-size: 34px; color: #E8A234; font-weight: 700; max-width: 1300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+#subBar {
+  position: absolute; bottom: 16px; right: 34px; z-index: 20;
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(0,0,0,.6); border: 1px solid rgba(232,162,52,.3);
+  border-radius: 6px; padding: 6px 14px;
+  font-size: 16px; color: #C4956A; font-style: italic;
+  transition: opacity .35s;
+}
+#subBar.hidden { opacity: 0; }
+.sdot { width: 8px; height: 8px; border-radius: 50%; }
+.sdot.ok  { background: #2ecc71; box-shadow: 0 0 6px #2ecc71; }
+.sdot.warn{ background: #E8A234; box-shadow: 0 0 6px #E8A234; }
+.sdot.err { background: #e74c3c; }
+.sdot.ld  { background: #FF6B2B; animation: blink .85s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+/* Embed error */
+#embedErr {
+  display: none; position: absolute; inset: 0;
+  background: rgba(18,8,0,.95); z-index: 30;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; text-align: center; padding: 80px;
+}
+#embedErr.show { display: flex; }
+#embedErr h2 { font-family: 'Playfair Display', serif; font-size: 36px; color: #E8A234; }
+#embedErr p  { font-size: 18px; color: #C4956A; max-width: 900px; line-height: 1.7; font-style: italic; }
+.errBtn {
+  display: inline-block;
+  background: #8B1A1A; border: 2px solid #E8A234;
+  border-radius: 8px; color: #E8A234;
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
+  padding: 14px 40px; cursor: pointer; letter-spacing: 1px; text-decoration: none;
+  transition: all .2s; margin: 4px;
+}
+.errBtn.focused, .errBtn:hover { background: #FF6B2B; color: #120800; box-shadow: 0 0 0 4px rgba(255,215,0,.4); }
+#errBack { background: rgba(60,20,0,.5); border-color: rgba(232,162,52,.4); color: #C4956A; }
+
+/* URL Modal */
+#modal {
+  display: none; position: absolute; inset: 0;
+  background: rgba(0,0,0,.88); z-index: 50;
+  align-items: center; justify-content: center;
+}
+#modal.show { display: flex; }
+.modal-box {
+  background: #1E0C00; border: 2px solid #E8A234;
+  border-radius: 14px; padding: 48px 58px;
+  width: 1100px; text-align: center;
+}
+.modal-box h2 { font-family: 'Playfair Display', serif; font-size: 36px; color: #E8A234; margin-bottom: 10px; }
+.modal-box p  { font-size: 18px; color: #C4956A; font-style: italic; margin-bottom: 28px; line-height: 1.6; }
+#urlInput {
+  width: 100%; background: rgba(18,8,0,.9);
+  border: 2px solid rgba(232,162,52,.4); border-radius: 8px;
+  color: #FFF8EE; font-family: inherit; font-size: 26px;
+  padding: 16px 22px; outline: none; caret-color: #E8A234;
+}
+#urlInput:focus { border-color: #FFD700; }
+.modal-btns { display: flex; justify-content: center; gap: 18px; margin-top: 26px; }
+.mBtn {
+  background: linear-gradient(135deg, #8B1A1A, #5C0A0A);
+  border: 2px solid transparent; border-radius: 8px;
+  color: #E8A234; font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700;
+  padding: 14px 38px; cursor: pointer; letter-spacing: 1px; transition: all .2s;
+}
+.mBtn.focused, .mBtn:hover { border-color: #FFD700; box-shadow: 0 0 0 4px rgba(255,215,0,.35); background: linear-gradient(135deg,#FF6B2B,#8B1A1A); color: #120800; }
+.mCancel { background: rgba(139,26,26,.3); border: 2px solid rgba(232,162,52,.3); color: #C4956A; }
+.mCancel.focused, .mCancel:hover { background: rgba(139,26,26,.5); color: #FFF8EE; box-shadow: none; border-color: #C4956A; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ HOME ══ -->
+  <div id="home" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="logo">Bollywood PT</div>
+        <div class="logo-sub">✦ Cinema Indiano com Legendas em Português ✦</div>
+      </div>
+      <div id="clock"></div>
+    </div>
+    <div class="divider"></div>
+
+    <div class="srow">
+      <div id="searchWrap">
+        <span class="sico">🔍</span>
+        <input id="searchInput" type="text" placeholder="Filtrar filmes por nome, idioma ou gênero…" autocomplete="off" spellcheck="false"/>
+      </div>
+      <button id="urlBtn" class="focusable">🔗 COLAR URL</button>
+    </div>
+
+    <div class="cats" id="cats">
+      <div class="cat focusable on"  data-cat="todos">Todos</div>
+      <div class="cat focusable" data-cat="romance">Romance</div>
+      <div class="cat focusable" data-cat="ação">Ação</div>
+      <div class="cat focusable" data-cat="drama">Drama</div>
+      <div class="cat focusable" data-cat="comédia">Comédia</div>
+      <div class="cat focusable" data-cat="clássico">Clássicos</div>
+      <div class="cat focusable" data-cat="épico">Épicos</div>
+      <div class="cat focusable" data-cat="sul">Cinema Sul</div>
+    </div>
+
+    <div id="st">↑↓←→ para navegar · OK para assistir · 🔗 para colar link</div>
+    <div id="gridWrap"><div id="grid"></div></div>
+  </div>
+
+  <!-- ══ PLAYER ══ -->
+  <div id="player" class="screen">
+    <div id="ytDiv"></div>
+    <div id="subOverlay"><div id="subText"></div></div>
+    <div id="hud">
+      <div id="backBtn" class="focusable">← VOLTAR</div>
+      <div id="playerTitle"></div>
+    </div>
+    <div id="subBar"><div class="sdot ld" id="sdot"></div><span id="sl">…</span></div>
+    <div id="embedErr">
+      <h2>🎬 Vídeo bloqueado</h2>
+      <p>Este canal não permite reprodução externa.<br/>Abra o app YouTube na TV e pesquise o filme.</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+        <a id="ytLink" class="errBtn focusable" href="#" target="_blank">🔍 Buscar no YouTube</a>
+        <div id="errBack" class="errBtn focusable">← Voltar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL ══ -->
+  <div id="modal">
+    <div class="modal-box">
+      <h2>🔗 Colar link do YouTube</h2>
+      <p>Cole o link de qualquer filme indiano do YouTube<br/>
+        <small style="color:rgba(196,149,106,.5);font-size:16px">https://youtube.com/watch?v=xxxxxxxxxx</small>
+      </p>
+      <input id="urlInput" type="text" placeholder="https://youtube.com/watch?v=..."/>
+      <div class="modal-btns">
+        <div class="mBtn focusable" id="modalOk">▶ Abrir com Legenda</div>
+        <div class="mBtn mCancel focusable" id="modalCancel">Cancelar</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- #app -->
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+'use strict';
+
+// ── SCALE ──────────────────────────────────────────
+const APP = document.getElementById('app');
+function scale() {
+  const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  APP.style.transform = `scale(${s})`;
+  APP.style.left = ((window.innerWidth  - 1920 * s) / 2) + 'px';
+  APP.style.top  = ((window.innerHeight - 1080 * s) / 2) + 'px';
+}
+scale();
+window.addEventListener('resize', scale);
+
+// ── CLOCK ──────────────────────────────────────────
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    n.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) + '\n' +
+    n.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'});
+}
+tick(); setInterval(tick, 1000);
+
+// ── MOVIE DATA ─────────────────────────────────────
+// No hardcoded video IDs — YouTube search embed finds the real video
+const MOVIES = [
+  {title:"Maine Pyar Kiya",         year:"1989", lang:"Hindi",   cat:"romance", q:"Maine Pyar Kiya 1989 full movie hindi"},
+  {title:"Hum Aapke Hain Koun",     year:"1994", lang:"Hindi",   cat:"romance", q:"Hum Aapke Hain Koun full movie"},
+  {title:"Dilwale Dulhania Le Jayenge", year:"1995", lang:"Hindi", cat:"romance", q:"Dilwale Dulhania Le Jayenge full movie"},
+  {title:"Kuch Kuch Hota Hai",      year:"1998", lang:"Hindi",   cat:"romance", q:"Kuch Kuch Hota Hai full movie"},
+  {title:"Mohabbatein",             year:"2000", lang:"Hindi",   cat:"romance", q:"Mohabbatein 2000 full movie hindi"},
+  {title:"Kabhi Khushi Kabhie Gham",year:"2001", lang:"Hindi",   cat:"romance", q:"Kabhi Khushi Kabhie Gham full movie"},
+  {title:"Kal Ho Naa Ho",           year:"2003", lang:"Hindi",   cat:"romance", q:"Kal Ho Naa Ho full movie hindi"},
+  {title:"Veer-Zaara",              year:"2004", lang:"Hindi",   cat:"romance", q:"Veer Zaara full movie hindi"},
+  {title:"Jab We Met",              year:"2007", lang:"Hindi",   cat:"romance", q:"Jab We Met full movie hindi"},
+  {title:"Yeh Jawaani Hai Deewani", year:"2013", lang:"Hindi",   cat:"romance", q:"Yeh Jawaani Hai Deewani full movie"},
+  {title:"Sholay",                  year:"1975", lang:"Hindi",   cat:"ação",    q:"Sholay 1975 full movie hindi"},
+  {title:"Don",                     year:"1978", lang:"Hindi",   cat:"ação",    q:"Don 1978 Amitabh full movie"},
+  {title:"Deewar",                  year:"1975", lang:"Hindi",   cat:"ação",    q:"Deewar 1975 full movie hindi"},
+  {title:"Dhoom",                   year:"2004", lang:"Hindi",   cat:"ação",    q:"Dhoom 2004 full movie hindi"},
+  {title:"Krrish",                  year:"2006", lang:"Hindi",   cat:"ação",    q:"Krrish 2006 full movie hindi"},
+  {title:"Dabangg",                 year:"2010", lang:"Hindi",   cat:"ação",    q:"Dabangg 2010 full movie hindi"},
+  {title:"War",                     year:"2019", lang:"Hindi",   cat:"ação",    q:"War 2019 full movie hindi"},
+  {title:"Mother India",            year:"1957", lang:"Hindi",   cat:"drama",   q:"Mother India 1957 full movie"},
+  {title:"Anand",                   year:"1971", lang:"Hindi",   cat:"drama",   q:"Anand 1971 full movie hindi"},
+  {title:"Taare Zameen Par",        year:"2007", lang:"Hindi",   cat:"drama",   q:"Taare Zameen Par full movie"},
+  {title:"Udaan",                   year:"2010", lang:"Hindi",   cat:"drama",   q:"Udaan 2010 full movie hindi"},
+  {title:"Andaz Apna Apna",         year:"1994", lang:"Hindi",   cat:"comédia", q:"Andaz Apna Apna full movie"},
+  {title:"Hera Pheri",              year:"2000", lang:"Hindi",   cat:"comédia", q:"Hera Pheri 2000 full movie hindi"},
+  {title:"Munna Bhai M.B.B.S.",     year:"2003", lang:"Hindi",   cat:"comédia", q:"Munna Bhai MBBS full movie hindi"},
+  {title:"Lage Raho Munna Bhai",    year:"2006", lang:"Hindi",   cat:"comédia", q:"Lage Raho Munna Bhai full movie"},
+  {title:"Welcome",                 year:"2007", lang:"Hindi",   cat:"comédia", q:"Welcome 2007 full movie hindi"},
+  {title:"3 Idiots",                year:"2009", lang:"Hindi",   cat:"comédia", q:"3 Idiots 2009 full movie hindi"},
+  {title:"Awaara",                  year:"1951", lang:"Hindi",   cat:"clássico",q:"Awaara 1951 full movie hindi"},
+  {title:"Mughal-E-Azam",           year:"1960", lang:"Hindi",   cat:"clássico",q:"Mughal E Azam full movie hindi"},
+  {title:"Devdas",                  year:"2002", lang:"Hindi",   cat:"clássico",q:"Devdas 2002 full movie hindi"},
+  {title:"Lagaan",                  year:"2001", lang:"Hindi",   cat:"épico",   q:"Lagaan 2001 full movie hindi"},
+  {title:"Jodhaa Akbar",            year:"2008", lang:"Hindi",   cat:"épico",   q:"Jodhaa Akbar full movie hindi"},
+  {title:"Bajirao Mastani",         year:"2015", lang:"Hindi",   cat:"épico",   q:"Bajirao Mastani full movie hindi"},
+  {title:"Baahubali: The Beginning",year:"2015", lang:"Telugu",  cat:"sul",     q:"Baahubali The Beginning full movie"},
+  {title:"Baahubali 2",             year:"2017", lang:"Telugu",  cat:"sul",     q:"Baahubali 2 The Conclusion full movie"},
+  {title:"RRR",                     year:"2022", lang:"Telugu",  cat:"sul",     q:"RRR 2022 full movie Telugu"},
+  {title:"Pushpa: The Rise",        year:"2021", lang:"Telugu",  cat:"sul",     q:"Pushpa The Rise full movie"},
+  {title:"KGF: Chapter 1",          year:"2018", lang:"Kannada", cat:"sul",     q:"KGF Chapter 1 full movie"},
+  {title:"KGF: Chapter 2",          year:"2022", lang:"Kannada", cat:"sul",     q:"KGF Chapter 2 full movie"},
+  {title:"Vikram",                  year:"2022", lang:"Tamil",   cat:"sul",     q:"Vikram 2022 full movie Tamil"},
+];
+
+// Poster gradient per movie
+const GRADS = [
+  ['#3D0A00','#8B1A1A'], ['#0A1A3D','#1A3D8B'], ['#0A3D1A','#1A8B3D'],
+  ['#2D0A3D','#6B1A8B'], ['#3D2D0A','#8B6B1A'], ['#0A2D3D','#1A6B8B'],
+  ['#3D1A0A','#8B4A1A'], ['#1A3D0A','#4A8B1A'],
+];
+function grad(i){ const [a,b] = GRADS[i % GRADS.length]; return `linear-gradient(135deg,${a},${b})`; }
+
+// ── GRID ───────────────────────────────────────────
+let activeCat = 'todos', searchQ = '';
+
+function filtered() {
+  return MOVIES.filter(m => {
+    const catOk = activeCat === 'todos' || m.cat === activeCat;
+    const qOk   = !searchQ || [m.title, m.lang, m.cat].join(' ').toLowerCase().includes(searchQ.toLowerCase());
+    return catOk && qOk;
+  });
+}
+
+function renderGrid(keepFocus) {
+  const grid = document.getElementById('grid');
+  const list = filtered();
+  grid.innerHTML = '';
+  if (!list.length) { document.getElementById('st').textContent = 'Nenhum filme encontrado.'; return; }
+  document.getElementById('st').textContent = `${list.length} filmes · ↑↓←→ navegar · OK assistir`;
+
+  list.forEach((m, i) => {
+    const c = document.createElement('div');
+    c.className = 'card focusable';
+    c.innerHTML = `
+      <div class="poster" style="background:${grad(i)}">
+        <div class="poster-inner">
+          <div class="poster-icon">🎬</div>
+          <div class="poster-title">${m.title}</div>
+        </div>
+        <div class="play-circle"><div class="play-icon"></div></div>
+        <div class="lang-badge">🇮🇳 ${m.lang}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${m.title}</div>
+        <div class="card-meta">${m.year} · ${m.cat}</div>
+      </div>`;
+    c.addEventListener('click', () => openMovie(m));
+    grid.appendChild(c);
+  });
+  if (!keepFocus) setTimeout(() => focusEl(grid.querySelector('.card')), 80);
+}
+
+// ── FOCUS ──────────────────────────────────────────
+let focused = null;
+function focusEl(el) {
+  if (!el) return;
+  if (focused) focused.classList.remove('focused');
+  focused = el;
+  el.classList.add('focused');
+  el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+
+// ── CATEGORIES ─────────────────────────────────────
+function setCat(cat) {
+  activeCat = cat;
+  document.querySelectorAll('.cat').forEach(c => c.classList.toggle('on', c.dataset.cat === cat));
+  renderGrid();
+}
+document.querySelectorAll('.cat').forEach(c => c.addEventListener('click', () => setCat(c.dataset.cat)));
+
+document.getElementById('searchInput').addEventListener('input', e => { searchQ = e.target.value; renderGrid(true); });
+document.getElementById('searchInput').addEventListener('focus', () => {
+  document.getElementById('searchWrap').classList.add('focused');
+  focused = document.getElementById('searchWrap');
+});
+document.getElementById('searchInput').addEventListener('blur', () => {
+  document.getElementById('searchWrap').classList.remove('focused');
+});
+
+// ── YOUTUBE PLAYER ─────────────────────────────────
+let ytReady = false, ytQueue = null;
+window.onYouTubeIframeAPIReady = () => { ytReady = true; if (ytQueue) { ytQueue(); ytQueue = null; } };
+
+let player = null, subs = [], syncTimer = null;
+
+function whenYT(fn) { ytReady ? fn() : (ytQueue = fn); }
+
+function destroyPlayer() {
+  clearInterval(syncTimer);
+  try { if (player) player.destroy(); } catch(e) {}
+  player = null; subs = [];
+}
+
+function createPlayer(opts) {
+  destroyPlayer();
+  document.getElementById('ytDiv').innerHTML = '';
+  whenYT(() => {
+    player = new YT.Player('ytDiv', {
+      width: '1920', height: '1080',
+      playerVars: { autoplay:1, cc_load_policy:1, cc_lang_pref:'pt-BR', hl:'pt-BR', rel:0, iv_load_policy:3, modestbranding:1, ...opts.vars },
+      events: {
+        onReady:       e => { startSync(); showHud(); opts.onReady && opts.onReady(e); },
+        onStateChange: e => opts.onState && opts.onState(e),
+        onError:       e => opts.onError && opts.onError(e),
+      }
+    });
+  });
+}
+
+function startSync() {
+  clearInterval(syncTimer);
+  syncTimer = setInterval(() => {
+    if (!player || !player.getCurrentTime) return;
+    const ms = player.getCurrentTime() * 1000;
+    const hit = subs.find(s => ms >= s.s && ms < s.e);
+    document.getElementById('subText').textContent = hit ? hit.t : '';
+  }, 200);
+}
+
+// ── OPEN MOVIE (search embed) ───────────────────────
+function openMovie(m) {
+  document.getElementById('subText').textContent = '';
+  document.getElementById('embedErr').classList.remove('show');
+  document.getElementById('playerTitle').textContent = `${m.title} (${m.year})`;
+  showScreen('player');
+  focusEl(document.getElementById('backBtn'));
+  setSS('Carregando…', 'ld');
+  subs = [];
+
+  createPlayer({
+    vars: { listType: 'search', list: m.q },
+    onState(e) {
+      // Once playing, grab real video ID for subtitles
+      if (e.data === 1 && !subs.length) {
+        try {
+          const vid = player.getVideoData().video_id;
+          if (vid) loadSubs(vid);
+        } catch(err) {}
+      }
+    },
+    onError(e) {
+      if ([100,101,150,153,2].includes(e.data)) {
+        document.getElementById('ytLink').href = `https://www.youtube.com/results?search_query=${encodeURIComponent(m.q)}`;
+        document.getElementById('embedErr').classList.add('show');
+        focusEl(document.getElementById('errBack'));
+      }
+    }
+  });
+}
+
+// ── SUBTITLES ──────────────────────────────────────
+const PROX = [
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+];
+async function pFetch(url, ms = 5000) {
+  for (const mk of PROX) {
+    try {
+      const ctrl = new AbortController(), t = setTimeout(() => ctrl.abort(), ms);
+      const r = await fetch(mk(url), { signal: ctrl.signal });
+      clearTimeout(t);
+      if (r.ok) return await r.text();
+    } catch {}
+  }
+  throw new Error('proxy fail');
+}
+function parseJ3(raw) {
+  try {
+    const j = JSON.parse(raw);
+    return (j.events || []).filter(e => e.segs).map(e => ({
+      s: e.tStartMs, e: e.tStartMs + (e.dDurationMs || 2800),
+      t: e.segs.map(x => x.utf8 || '').join('').replace(/\n/g, ' ').trim()
+    })).filter(e => e.t);
+  } catch { return []; }
+}
+async function tryLang(vid, lang, kind = '') {
+  try { return parseJ3(await pFetch(`https://www.youtube.com/api/timedtext?v=${vid}&lang=${lang}&fmt=json3${kind ? `&kind=${kind}` : ''}`, 4500)); }
+  catch { return []; }
+}
+
+function setSS(t, m = 'ld') {
+  document.getElementById('sdot').className = 'sdot ' + m;
+  document.getElementById('sl').textContent = t;
+}
+
+// Free translation — MyMemory (no API key)
+async function trLine(text, from) {
+  if (!text.trim()) return text;
+  try {
+    const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0,450))}&langpair=${from}|pt-BR`);
+    const d = await r.json();
+    return d?.responseData?.translatedText || text;
+  } catch { return text; }
+}
+async function translateAll(raw, from) {
+  const res = [...raw], C = 8;
+  for (let i = 0; i < raw.length; i += C) {
+    setSS(`Traduzindo ${from.toUpperCase()}→PT (${Math.round(i / raw.length * 100)}%)…`, 'warn');
+    const tr = await Promise.all(raw.slice(i, i + C).map(s => trLine(s.t, from)));
+    tr.forEach((t, k) => { res[i + k] = { ...raw[i + k], t }; });
+    subs = res.slice(0, i + C);
+    await new Promise(r => setTimeout(r, 250));
+  }
+  subs = res;
+  setSS('Legendas em PT ✓', 'ok');
+}
+
+async function loadSubs(videoId) {
+  if (subs.length) return;
+  subs = []; setSS('Buscando legendas…', 'ld');
+  const [ptR, enR, hiR, teR] = await Promise.all([
+    tryLang(videoId, 'pt-BR'), tryLang(videoId, 'en'),
+    tryLang(videoId, 'hi'),    tryLang(videoId, 'te'),
+  ]);
+  let chosen = null, lang = '';
+  for (const [r, l] of [[ptR,'pt'], [enR,'en'], [hiR,'hi'], [teR,'te']]) {
+    if (r.length > 5) { chosen = r; lang = l; break; }
+  }
+  if (!chosen) {
+    setSS('Tentando legendas automáticas…', 'ld');
+    const [ae, ah] = await Promise.all([tryLang(videoId,'en','asr'), tryLang(videoId,'hi','asr')]);
+    if (ae.length > 5) { chosen = ae; lang = 'en'; }
+    else if (ah.length > 5) { chosen = ah; lang = 'hi'; }
+  }
+  if (chosen) {
+    subs = chosen;
+    if (lang === 'pt' || lang === 'pt-BR') { setSS('Legendas em PT ✓', 'ok'); }
+    else translateAll(chosen, lang); // background
+  } else {
+    setSS('Sem legenda neste vídeo', 'err');
+  }
+}
+
+// ── SCREENS ────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => { s.style.display = 'none'; });
+  const el = document.getElementById(id);
+  el.style.display = 'flex';
+}
+
+function closePlayer() {
+  destroyPlayer();
+  document.getElementById('subText').textContent = '';
+  document.getElementById('embedErr').classList.remove('show');
+  showScreen('home');
+  focusEl(document.querySelector('.card') || document.getElementById('searchWrap'));
+}
+
+document.getElementById('backBtn').addEventListener('click', closePlayer);
+document.getElementById('errBack').addEventListener('click', closePlayer);
+
+// ── HUD SHOW/HIDE ──────────────────────────────────
+let hudT = null;
+function showHud() {
+  document.getElementById('hud').classList.remove('hidden');
+  document.getElementById('subBar').classList.remove('hidden');
+  clearTimeout(hudT);
+  hudT = setTimeout(() => {
+    document.getElementById('hud').classList.add('hidden');
+    document.getElementById('subBar').classList.add('hidden');
+  }, 4000);
+}
+
+// ── MODAL (paste URL) ──────────────────────────────
+document.getElementById('urlBtn').addEventListener('click', openModal);
+function openModal() {
+  document.getElementById('urlInput').value = '';
+  document.getElementById('modal').classList.add('show');
+  setTimeout(() => document.getElementById('urlInput').focus(), 100);
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+  focusEl(document.getElementById('searchWrap'));
+}
+function extractId(s) {
+  const m = s.trim().match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : (/^[a-zA-Z0-9_-]{11}$/.test(s.trim()) ? s.trim() : null);
+}
+function doOpen() {
+  const vid = extractId(document.getElementById('urlInput').value);
+  if (!vid) { document.getElementById('urlInput').style.borderColor = '#e74c3c'; setTimeout(() => document.getElementById('urlInput').style.borderColor = '', 1500); return; }
+  closeModal();
+  document.getElementById('subText').textContent = '';
+  document.getElementById('embedErr').classList.remove('show');
+  document.getElementById('playerTitle').textContent = 'Filme do YouTube';
+  showScreen('player');
+  focusEl(document.getElementById('backBtn'));
+  subs = [];
+  createPlayer({
+    vars: { videoId: vid },
+    onReady() { loadSubs(vid); },
+    onError(e) {
+      if ([100,101,150,153].includes(e.data)) {
+        document.getElementById('embedErr').classList.add('show');
+        focusEl(document.getElementById('errBack'));
+      }
+    }
+  });
+}
+document.getElementById('modalOk').addEventListener('click', doOpen);
+document.getElementById('modalCancel').addEventListener('click', closeModal);
+document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key === 'Enter') doOpen(); });
+
+// ── D-PAD NAVIGATION ───────────────────────────────
+const K = {
+  UP: ['ArrowUp','Up'], DN: ['ArrowDown','Down'],
+  LT: ['ArrowLeft','Left'], RT: ['ArrowRight','Right'],
+  OK: ['Enter',' '], BK: ['Backspace','Escape','GoBack'],
+};
+function ik(e, g) { return K[g].includes(e.key); }
+
+document.addEventListener('keydown', e => {
+  // Modal
+  if (document.getElementById('modal').classList.contains('show')) {
+    if (ik(e,'BK')) { closeModal(); e.preventDefault(); }
+    if (ik(e,'OK')) {
+      if (focused === document.getElementById('modalOk')) doOpen();
+      if (focused === document.getElementById('modalCancel')) closeModal();
+    }
+    return;
+  }
+  // Player
+  if (document.getElementById('player').style.display === 'flex') {
+    showHud();
+    if (ik(e,'BK') || ik(e,'UP'))  { closePlayer(); e.preventDefault(); return; }
+    if (ik(e,'OK') && (focused === document.getElementById('backBtn') || focused === document.getElementById('errBack'))) { closePlayer(); }
+    e.preventDefault(); return;
+  }
+  // Home
+  navHome(e);
+});
+
+function navHome(e) {
+  const cats  = [...document.querySelectorAll('.cat')];
+  const cards = [...document.querySelectorAll('.card')];
+  const sw  = document.getElementById('searchWrap');
+  const btn = document.getElementById('urlBtn');
+  const isSW  = focused === sw, isBtn = focused === btn;
+  const ci = cats.indexOf(focused), ki = cards.indexOf(focused);
+
+  if (ik(e,'OK')) {
+    if (isSW)  { document.getElementById('searchInput').focus(); return; }
+    if (isBtn) { openModal(); return; }
+    if (ci >= 0) { setCat(focused.dataset.cat); return; }
+    if (ki >= 0) { focused.click(); return; }
+    e.preventDefault(); return;
+  }
+  if (ik(e,'BK')) { document.getElementById('searchInput').blur(); focusEl(sw); e.preventDefault(); return; }
+  e.preventDefault();
+
+  if (isSW)  { if (ik(e,'RT')) focusEl(btn); if (ik(e,'DN')) focusEl(cats[0] || cards[0]); return; }
+  if (isBtn) { if (ik(e,'LT')) focusEl(sw);  if (ik(e,'DN')) focusEl(cats[0] || cards[0]); return; }
+  if (ci >= 0) {
+    if (ik(e,'LT')) focusEl(ci > 0 ? cats[ci-1] : sw);
+    if (ik(e,'RT')) focusEl(ci < cats.length-1 ? cats[ci+1] : btn);
+    if (ik(e,'UP')) focusEl(sw);
+    if (ik(e,'DN') && cards.length) focusEl(cards[0]);
+    return;
+  }
+  if (ki >= 0) {
+    const C = 5;
+    if (ik(e,'RT') && ki < cards.length-1) focusEl(cards[ki+1]);
+    if (ik(e,'LT') && ki > 0)             focusEl(cards[ki-1]);
+    if (ik(e,'DN') && ki+C < cards.length) focusEl(cards[ki+C]);
+    if (ik(e,'UP')) ki >= C ? focusEl(cards[ki-C]) : focusEl(cats.length ? cats[0] : sw);
+  }
+}
+
+// ── START ──────────────────────────────────────────
+renderGrid();
+setTimeout(() => focusEl(document.getElementById('searchWrap')), 100);
+</script>
+</body>
+</html>
